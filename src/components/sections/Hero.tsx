@@ -65,7 +65,7 @@ export function Hero() {
                             className="group"
                             onClick={() => setIsDemoOpen(true)}
                         >
-                            Listen to Demo <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            Voice Demo Active <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Button>
                     </motion.div>
 
