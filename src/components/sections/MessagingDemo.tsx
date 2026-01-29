@@ -161,7 +161,7 @@ export function MessagingDemo() {
                                             <iframe
                                                 ref={frameRef}
                                                 src="https://iframes.ai/o/1760442563274x523950783927418900?color=ffffff&icon="
-                                                allow="microphone; camera; autoplay; encrypted-media; fullscreen; display-capture; picture-in-picture; clipboard-read; clipboard-write;"
+                                                allow="microphone *; camera *; autoplay *; encrypted-media *; fullscreen *; display-capture *; picture-in-picture *; clipboard-read *; clipboard-write *;"
                                                 className="w-full h-[200px] border-none"
                                                 id="assistantFrame"
                                                 title="Voice AI Demo"

@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            value: 'microphone=(self "https://iframes.ai")',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
