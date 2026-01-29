@@ -106,7 +106,7 @@ export default function BuildPage() {
                         className="relative"
                     >
                         <div className="absolute -inset-4 bg-red-500/10 rounded-3xl blur-2xl" />
-                        
+
                         <div className="relative bg-ocean-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden min-h-[480px] flex flex-col">
                             {/* Window Header */}
                             <div className="bg-ocean-950 border-b border-white/10 px-6 py-4 flex items-center justify-between">
@@ -128,7 +128,7 @@ export default function BuildPage() {
                             {/* Builder Container */}
                             <div className="flex-1 bg-black/20 p-8 flex flex-col items-center justify-center min-h-[360px]">
                                 <div className="w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6">
-                                    <iframe 
+                                    <iframe
                                         ref={frameRef}
                                         src="https://iframes.ai/o/1769679258407x567728720327999500?color=ed0f14&icon="
                                         allow="microphone"
@@ -136,7 +136,7 @@ export default function BuildPage() {
                                         id="assistantFrame"
                                         title="Agent Builder"
                                     />
-                                    
+
                                     <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500 uppercase tracking-tight">
                                             <Mic className={`w-3 h-3 ${micPermissionGranted ? 'text-red-500' : 'text-red-500/30'}`} />
@@ -160,9 +160,9 @@ export default function BuildPage() {
                         {/* Decorative Console Tags */}
                         <div className="absolute -bottom-6 -right-6 hidden lg:block">
                             <div className="bg-ocean-800 border border-white/10 p-4 rounded-lg shadow-xl font-mono text-[10px] space-y-1">
-                                <div className="text-red-500">> sys_init_complete</div>
-                                <div className="text-gray-500">> neural_sync_ready</div>
-                                <div className="text-gray-500">> waiting_for_vocal_id</div>
+                                <div className="text-red-500">{'>'} sys_init_complete</div>
+                                <div className="text-gray-500">{'>'} neural_sync_ready</div>
+                                <div className="text-gray-500">{'>'} waiting_for_vocal_id</div>
                             </div>
                         </div>
                     </motion.div>
