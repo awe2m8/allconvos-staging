@@ -57,7 +57,7 @@ export function Hero() {
                         <Button
                             variant="secondary"
                             className="group"
-                            onClick={() => document.getElementById('mission-control')?.scrollIntoView({ behavior: 'smooth' })}
+                            onClick={() => document.getElementById('messaging-demo')?.scrollIntoView({ behavior: 'smooth' })}
                         >
                             Voice Demo Active <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </Button>
@@ -98,16 +98,6 @@ export function Hero() {
                                 <div className="bg-ocean-800 p-3 rounded-lg rounded-tl-none border border-white/5 text-gray-300">
                                     <p>Hey, do you guys do emergency plumbing in Ballina?</p>
                                 </div>
-                            </div>
-
-                            {/* Live Voice AI Widget */}
-                            <div className="flex justify-center items-center py-4 bg-white/5 rounded-lg border border-white/5 animate-in fade-in zoom-in duration-700">
-                                <iframe
-                                    src="https://iframes.ai/o/1760442563274x523950783927418900?color=ffffff&icon="
-                                    allow="microphone; camera; autoplay; encrypted-media; fullscreen; display-capture; picture-in-picture; clipboard-read; clipboard-write;"
-                                    className="w-full h-[200px] border-none"
-                                    id="assistantFrame"
-                                />
                             </div>
 
                             {/* Chat Message 2 */}
