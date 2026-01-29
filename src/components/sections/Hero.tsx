@@ -87,10 +87,13 @@ export function Hero() {
                     <div className="absolute -inset-1 bg-gradient-to-r from-neon to-blue-600 rounded-lg blur opacity-20" />
                     <div className="relative bg-ocean-900 border border-white/10 rounded-lg shadow-2xl overflow-hidden">
                         <div className="bg-ocean-950 border-b border-white/10 px-4 py-3 flex items-center justify-between">
-                            <div className="flex space-x-2">
-                                <div className="w-3 h-3 rounded-full bg-red-500" />
-                                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                                <div className="w-3 h-3 rounded-full bg-green-500" />
+                            <div className="flex items-center gap-4">
+                                <div className="flex space-x-2">
+                                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                                </div>
+                                <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest hidden sm:block">For Illustration Only</span>
                             </div>
                             <div className="font-mono text-xs text-gray-500">live_agent_v2.0.exe</div>
                         </div>

@@ -87,9 +87,12 @@ export function MessagingDemo() {
                         <div className="relative bg-ocean-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden min-h-[440px] flex flex-col">
                             {/* Window Header */}
                             <div className="bg-ocean-950 border-b border-white/10 px-6 py-4 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <MessageSquare className="w-4 h-4 text-neon" />
-                                    <span className="text-sm font-bold text-white uppercase tracking-tighter">AI_Receptionist_Live</span>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <MessageSquare className="w-4 h-4 text-neon" />
+                                        <span className="text-sm font-bold text-white uppercase tracking-tighter">AI_Receptionist_Live</span>
+                                    </div>
+                                    <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest hidden sm:block">For Illustration Only</span>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-1.5">
