@@ -122,9 +122,9 @@ export function Hero() {
                     {isHighlighting && (
                         <motion.div
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: [0, 0.4, 0.2, 0.4, 0] }}
-                            transition={{ duration: 2, times: [0, 0.1, 0.5, 0.9, 1] }}
-                            className="absolute -inset-0.5 rounded-lg bg-neon z-20 pointer-events-none"
+                            animate={{ opacity: [0, 0.15, 0] }}
+                            transition={{ duration: 1.5, times: [0, 0.5, 1] }}
+                            className="absolute -inset-0.5 rounded-lg bg-neon/80 z-20 pointer-events-none"
                             style={{ filter: 'blur(1px)' }}
                         />
                     )}
