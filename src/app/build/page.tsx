@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { Mic, ShieldCheck, ArrowLeft, Bot, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../components/ui/Button";
+import { BuildNextSteps } from "../../components/sections/BuildNextSteps";
+import { Pricing } from "../../components/sections/Pricing";
 
 export default function BuildPage() {
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
@@ -51,7 +53,7 @@ export default function BuildPage() {
                     </div>
                 </nav>
 
-                <div className="grid lg:grid-cols-2 gap-16 items-start">
+                <div className="grid lg:grid-cols-2 gap-16 items-start mb-32">
                     {/* Left Side: Copy & Instructions */}
                     <div className="space-y-8">
                         <motion.div
@@ -165,6 +167,33 @@ export default function BuildPage() {
                                 <div className="text-gray-500">{'>'} waiting_for_vocal_id</div>
                             </div>
                         </div>
+                    </motion.div>
+                </div>
+
+                {/* Additional Sections */}
+                <BuildNextSteps />
+                <Pricing />
+
+                {/* Final Call to Action */}
+                <div className="py-24 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        className="max-w-2xl mx-auto p-12 rounded-[2.5rem] bg-gradient-to-b from-white/5 to-transparent border border-white/10 backdrop-blur-md"
+                    >
+                        <h2 className="text-3xl font-bold text-white mb-6 uppercase italic tracking-tight">
+                            Ready to go live?
+                        </h2>
+                        <p className="text-gray-400 mb-10 font-mono text-sm uppercase tracking-widest leading-relaxed">
+                            Initialize your professional mission control today.
+                        </p>
+                        <Button
+                            variant="primary"
+                            className="w-full sm:w-auto px-12 py-6 text-sm font-mono uppercase italic tracking-[0.2em]"
+                        >
+                            Initialize Mission_Now
+                        </Button>
                     </motion.div>
                 </div>
             </div>
