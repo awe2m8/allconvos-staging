@@ -2,6 +2,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/sections/Hero";
 import { VSL } from "@/components/sections/VSL";
+import { CallHandling } from "@/components/sections/CallHandling";
 import { MessagingDemo } from "@/components/sections/MessagingDemo";
 import { DashboardPreview } from "@/components/sections/DashboardPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <MessagingDemo />
       <VSL />
+      <CallHandling />
       <DashboardPreview />
       <HowItWorks />
       <Pricing />
