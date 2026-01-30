@@ -5,7 +5,6 @@ import { VSL } from "@/components/sections/VSL";
 import { TestimonialStrip } from "@/components/sections/TestimonialStrip";
 import { CallHandling } from "@/components/sections/CallHandling";
 import { DIYDemo } from "@/components/sections/DIYDemo";
-import { MessagingDemo } from "@/components/sections/MessagingDemo";
 import { DashboardPreview } from "@/components/sections/DashboardPreview";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Pricing } from "@/components/sections/Pricing";
@@ -15,7 +14,6 @@ export default function Home() {
     <main className="bg-ocean-950 min-h-screen relative overflow-x-hidden">
       <Navbar />
       <Hero />
-      <MessagingDemo />
       <VSL />
       <TestimonialStrip />
       <CallHandling />
