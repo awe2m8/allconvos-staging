@@ -66,12 +66,13 @@ export default function BuildPage() {
                             </div>
 
                             <h1 className="text-5xl font-bold leading-tight uppercase">
-                                create your <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 italic">digital twin</span>
+                                Create Your AI <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 italic">Receptionist</span>
+                                <span className="block text-2xl mt-4 text-neon font-mono tracking-[0.2em] italic">- Test It Free</span>
                             </h1>
 
                             <p className="text-lg text-gray-400 leading-relaxed">
-                                Use the voice interface on the right to train your AI agent. Tell it about your business, your pricing, and how you want it to handle customers.
+                                Use the voice interface to tell us about your business, pricing, and how you handle customers. We'll build your AI agent and call you so you can test it.
                             </p>
 
                             <div className="space-y-4">
