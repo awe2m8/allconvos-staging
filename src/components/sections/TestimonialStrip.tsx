@@ -38,13 +38,23 @@ export function TestimonialStrip() {
                     </div>
 
                     {/* Attribution */}
-                    <div className="flex flex-col items-center md:items-end">
-                        <p className="text-white font-black text-xs uppercase tracking-widest">
-                            Ryan
-                        </p>
-                        <p className="text-neon text-[10px] font-black uppercase tracking-widest mt-1">
-                            Fitness Box
-                        </p>
+                    <div className="flex items-center gap-4 md:border-l md:border-white/10 md:pl-8">
+                        <div className="flex flex-col items-center md:items-end order-2 md:order-1">
+                            <p className="text-white font-black text-xs uppercase tracking-widest whitespace-nowrap">
+                                Ryan
+                            </p>
+                            <p className="text-neon text-[10px] font-black uppercase tracking-widest mt-1 whitespace-nowrap">
+                                Fitness Box
+                            </p>
+                        </div>
+                        <div className="relative order-1 md:order-2">
+                            <div className="absolute -inset-1 bg-neon/20 rounded-full blur-[2px]" />
+                            <img
+                                src="/images/ryan-fitness.jpg"
+                                alt="Ryan"
+                                className="w-12 h-12 rounded-full border-2 border-white/20 object-cover relative z-10"
+                            />
+                        </div>
                     </div>
                 </motion.div>
             </div>
