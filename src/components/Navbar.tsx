@@ -20,6 +20,7 @@ export function Navbar() {
                         <Link href="#problem" className="hover:text-neon transition-colors">The Problem</Link>
                         <Link href="#how" className="hover:text-neon transition-colors">How It Works</Link>
                         <Link href="#pricing" className="hover:text-neon transition-colors">Pricing</Link>
+                        <Link href="/build" className="text-neon hover:text-white transition-colors">Build My Agent</Link>
                     </div>
 
                     <div className="hidden md:block">
