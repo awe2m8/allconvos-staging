@@ -130,7 +130,7 @@ export function Hero() {
                         <div className="p-4 space-y-4 font-mono text-sm relative">
                             {/* Experience the future of sales header */}
                             <div className="mb-2">
-                                <span className="text-[10px] text-neon uppercase tracking-widest font-bold">Experience the future of sales</span>
+                                <span className="text-xs text-neon uppercase tracking-wider font-bold">Experience the future of sales</span>
                             </div>
 
                             {/* Chat Illustration */}
