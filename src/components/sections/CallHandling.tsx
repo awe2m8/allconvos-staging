@@ -10,15 +10,28 @@ export function CallHandling() {
 
     const handlePlay = (type: string) => {
         if (playing === type) {
-            audioRef.current?.pause();
+            if (audioRef.current) {
+                audioRef.current.pause();
+            }
             setPlaying(null);
         } else {
             if (audioRef.current) {
+                // Stop any current playback
+                audioRef.current.pause();
+                audioRef.current.currentTime = 0;
+
+                // Update source and load
                 audioRef.current.src = `/audio/${type.toLowerCase()}.wav`;
-                audioRef.current.play().catch((err) => {
-                    console.error("Audio playback failed:", err);
-                    alert("Audio file not found. Please ensure tradies.wav and gyms.wav are in public/audio/");
-                });
+                audioRef.current.load();
+                audioRef.current.volume = 1.0;
+
+                const playPromise = audioRef.current.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch((err) => {
+                        console.error("Audio playback interrupted or failed:", err);
+                        setPlaying(null);
+                    });
+                }
                 setPlaying(type);
             }
         }
@@ -117,8 +130,8 @@ export function CallHandling() {
                                     <button
                                         onClick={() => handlePlay(cat.id)}
                                         className={`w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all duration-300 ${playing === cat.id
-                                                ? "bg-white text-black scale-95"
-                                                : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+                                            ? "bg-white text-black scale-95"
+                                            : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
                                             }`}
                                     >
                                         <AnimatePresence mode="wait">
