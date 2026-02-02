@@ -44,13 +44,13 @@ export default function BuildPage() {
             <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
                 {/* Header */}
                 <nav className="flex items-center justify-between mb-16">
+                    <Link href="/" className="font-mono text-2xl font-bold tracking-tighter text-white">
+                        allconvos<span className="text-neon">_</span>
+                    </Link>
                     <Link href="/" className="group flex items-center gap-2 text-sm font-mono text-gray-400 hover:text-white transition-colors">
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Back to Mission Control
                     </Link>
-                    <div className="font-mono text-xl font-bold tracking-tighter text-white">
-                        allconvos<span className="text-gray-400">_build</span>
-                    </div>
                 </nav>
                 <div className="grid lg:grid-cols-2 gap-16 items-start mb-16">
                     {/* Left Side: Copy & Instructions */}
