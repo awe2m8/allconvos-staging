@@ -57,7 +57,7 @@ export function Hero() {
                         className="inline-flex items-center space-x-2 bg-ocean-800/50 border border-white/10 px-3 py-1 rounded-full"
                     >
                         <span className="w-2 h-2 rounded-full bg-neon animate-pulse" />
-                        <span className="text-xs font-mono text-neon uppercase tracking-wider">Operational 24/7/365</span>
+                        <span className="text-xs font-mono text-neon uppercase tracking-wider">System Online * Ready for calls, 24/7/365</span>
                     </motion.div>
 
                     <motion.h1
