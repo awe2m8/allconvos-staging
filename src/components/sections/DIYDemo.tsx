@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { Phone, ArrowRight, Star, ShieldCheck, Zap } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Phone, ArrowRight, Star, ShieldCheck, Zap, RefreshCcw } from "lucide-react";
 
 export function DIYDemo() {
+    const [showVoice, setShowVoice] = useState(false);
+
     return (
         <section className="py-24 relative overflow-hidden bg-ocean-950">
             {/* Background Decor */}
@@ -36,7 +38,7 @@ export function DIYDemo() {
                             </p>
 
                             <p className="text-gray-400 text-lg mb-8 font-medium leading-relaxed max-w-xl">
-                                Be the caller: Ring our demo line to interact with AI Receptionist live and hear samples of how calls can be handled.
+                                Be the caller: Ring our demo line or use our browser-based AI to interact with AI Receptionist live and hear samples of how calls can be handled.
                             </p>
 
                             <div className="space-y-6">
@@ -72,7 +74,7 @@ export function DIYDemo() {
                             {/* Card Glow */}
                             <div className="absolute -inset-4 bg-neon/10 rounded-[2.5rem] blur-2xl" />
 
-                            <div className="relative bg-[#0a0c10] border border-white/10 rounded-[2rem] p-8 md:p-12 shadow-2xl overflow-hidden">
+                            <div className="relative bg-[#0a0c10] border border-white/10 rounded-[2rem] p-8 md:p-12 shadow-2xl overflow-hidden min-h-[500px] flex flex-col justify-center">
                                 {/* Background Pattern */}
                                 <div
                                     className="absolute inset-0 opacity-[0.03]"
@@ -82,48 +84,93 @@ export function DIYDemo() {
                                     }}
                                 />
 
-                                <div className="relative z-10 flex flex-col items-center text-center">
-                                    <div className="w-20 h-20 rounded-full bg-neon flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(217,255,65,0.3)] animate-pulse">
-                                        <Phone className="w-10 h-10 text-black fill-current" />
-                                    </div>
+                                <AnimatePresence mode="wait">
+                                    {!showVoice ? (
+                                        <motion.div
+                                            key="phone-ui"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="relative z-10 flex flex-col items-center text-center"
+                                        >
+                                            <div className="w-20 h-20 rounded-full bg-neon flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(217,255,65,0.3)] animate-pulse">
+                                                <Phone className="w-10 h-10 text-black fill-current" />
+                                            </div>
 
-                                    <h3 className="text-white text-sm font-black uppercase tracking-[0.3em] mb-4 opacity-50">
-                                        DIAL DIRECTLY
-                                    </h3>
+                                            <h3 className="text-white text-sm font-black uppercase tracking-[0.3em] mb-4 opacity-50">
+                                                DIAL DIRECTLY
+                                            </h3>
 
-                                    <a
-                                        href="tel:0485009296"
-                                        className="text-4xl md:text-5xl font-black text-white hover:text-neon transition-colors duration-300 tracking-tighter"
-                                    >
-                                        0485 009 296
-                                    </a>
-                                    <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2 mb-8">
-                                        Just call this number
-                                    </p>
+                                            <a
+                                                href="tel:0485009296"
+                                                className="text-4xl md:text-5xl font-black text-white hover:text-neon transition-colors duration-300 tracking-tighter"
+                                            >
+                                                0485 009 296
+                                            </a>
+                                            <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2 mb-8">
+                                                Just call this number
+                                            </p>
 
-                                    <div className="w-full h-px bg-white/10 mb-8" />
+                                            <div className="w-full h-px bg-white/10 mb-8" />
 
-                                    <div className="grid grid-cols-2 gap-4 w-full">
-                                        <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                                            <p className="text-neon text-[10px] font-black uppercase tracking-widest mb-1">Status</p>
-                                            <p className="text-white text-xs font-bold uppercase tracking-tight">System Online</p>
-                                        </div>
-                                        <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                                            <p className="text-neon text-[10px] font-black uppercase tracking-widest mb-1">Type</p>
-                                            <p className="text-white text-xs font-bold uppercase tracking-tight">Active Voice</p>
-                                        </div>
-                                    </div>
+                                            <div className="grid grid-cols-2 gap-4 w-full">
+                                                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                                                    <p className="text-neon text-[10px] font-black uppercase tracking-widest mb-1">Status</p>
+                                                    <p className="text-white text-xs font-bold uppercase tracking-tight">System Online</p>
+                                                </div>
+                                                <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                                                    <p className="text-neon text-[10px] font-black uppercase tracking-widest mb-1">Type</p>
+                                                    <p className="text-white text-xs font-bold uppercase tracking-tight">Active Voice</p>
+                                                </div>
+                                            </div>
 
-                                    <motion.a
-                                        href="tel:0485009296"
-                                        whileHover={{ scale: 1.02 }}
-                                        whileTap={{ scale: 0.98 }}
-                                        className="mt-10 w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-neon transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
-                                    >
-                                        Start Live Demo
-                                        <ArrowRight className="w-5 h-5" />
-                                    </motion.a>
-                                </div>
+                                            <motion.button
+                                                onClick={() => setShowVoice(true)}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="mt-10 w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-neon transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
+                                            >
+                                                Start Live Demo
+                                                <ArrowRight className="w-5 h-5" />
+                                            </motion.button>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="voice-ui"
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            className="relative z-10 flex flex-col items-center w-full"
+                                        >
+                                            <div className="w-full bg-ocean-900 shadow-[inset_0_0_40px_rgba(0,0,0,0.4)] rounded-2xl border border-white/5 p-4 mb-6">
+                                                <iframe
+                                                    src="https://iframes.ai/o/1770094548049x895768558885666800?color=26d0d1&icon="
+                                                    allow="microphone"
+                                                    style={{ width: "100%", height: "200px", border: "none" }}
+                                                    id="assistantFrame"
+                                                    title="AI Voice Assistant"
+                                                />
+                                            </div>
+
+                                            <div className="text-center space-y-4">
+                                                <p className="text-[10px] font-mono text-neon uppercase tracking-[0.2em] animate-pulse">
+                                                    Neural_Link_Established
+                                                </p>
+                                                <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-[280px]">
+                                                    Browser microphone access required. Click "Start Call" inside the widget to begin.
+                                                </p>
+
+                                                <button
+                                                    onClick={() => setShowVoice(false)}
+                                                    className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white transition-colors pt-4"
+                                                >
+                                                    <RefreshCcw className="w-3 h-3" />
+                                                    Back to Phone Dial
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </motion.div>
                     </div>
