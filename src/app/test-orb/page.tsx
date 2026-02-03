@@ -1,28 +1,10 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default function TestOrbPage() {
-    useEffect(() => {
-        // Load the widget script
-        const script = document.createElement("script");
-        script.src = "https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js";
-        script.async = true;
-        document.body.appendChild(script);
-
-        return () => {
-            // Cleanup script on unmount
-            const existingScript = document.querySelector(
-                'script[src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js"]'
-            );
-            if (existingScript) {
-                existingScript.remove();
-            }
-        };
-    }, []);
-
     return (
         <main className="min-h-screen bg-ocean-950 relative">
             {/* Background Decor */}
@@ -44,9 +26,27 @@ export default function TestOrbPage() {
                     <p className="text-gray-400 mt-2">Widget testing area</p>
                 </div>
 
-                {/* Widget Container */}
+                {/* Widget Container - Using iframe */}
                 <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/5 border border-white/10">
-                    <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"></div>
+                    <iframe
+                        src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js?widget_key=b22b183d-3336-4b9b-973d-12c1e47888c4"
+                        allow="microphone"
+                        className="w-full h-[400px] border-none rounded-xl"
+                        title="Widget Test"
+                    />
+                </div>
+
+                {/* Alternative: Raw HTML embed */}
+                <div className="max-w-2xl mx-auto mt-8 p-8 rounded-2xl bg-white/5 border border-white/10">
+                    <p className="text-gray-400 text-sm mb-4">Alternative embed (raw HTML):</p>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: `
+                                <script src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js"></script>
+                                <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"></div>
+                            `
+                        }}
+                    />
                 </div>
             </div>
         </main>
