@@ -41,13 +41,16 @@ const cardElementOptions = {
             color: "#ffffff",
             fontFamily: "ui-monospace, monospace",
             "::placeholder": {
-                color: "#6b7280",
+                color: "#9ca3af", // gray-400
             },
+            iconColor: "#ffffff",
         },
         invalid: {
             color: "#ef4444",
+            iconColor: "#ef4444",
         },
     },
+    hidePostalCode: true, // cleaner interface
 };
 
 function CheckoutForm() {
@@ -297,7 +300,7 @@ function CheckoutForm() {
                                             <div className="w-10 h-6 bg-blue-400 rounded flex items-center justify-center text-white text-[8px] font-bold">AMEX</div>
                                         </div>
                                     </div>
-                                    <div className="p-4 rounded-xl bg-ocean-950 border border-white/10">
+                                    <div className="p-4 rounded-xl bg-ocean-900 border border-white/10">
                                         <CardElement options={cardElementOptions} />
                                     </div>
                                 </div>
