@@ -196,13 +196,6 @@ export default function BuildPage() {
                         </Button>
                     </motion.div>
                 </div>
-
-                {/* Hidden test link */}
-                <div className="text-center py-4">
-                    <Link href="/test-orb" className="text-gray-700 hover:text-gray-500 text-xs">
-                        •
-                    </Link>
-                </div>
             </div>
         </main>
     );
