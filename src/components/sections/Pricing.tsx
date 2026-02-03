@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 import { Check, ShieldCheck, Zap, Globe, MessageSquare } from "lucide-react";
 import { Button } from "../ui/Button";
+import Link from "next/link";
 
 const plans = [
     {
+        id: "lite",
         name: "LITE_DEPLOYMENT",
         price: "$199",
         duration: "/mo",
@@ -16,6 +18,7 @@ const plans = [
         border: "border-blue-400/20"
     },
     {
+        id: "pro",
         name: "PRO_STRATEGY",
         price: "$499",
         duration: "/mo",
@@ -27,6 +30,7 @@ const plans = [
         popular: true
     },
     {
+        id: "elite",
         name: "ELITE_OVERSEER",
         price: "CUSTOM",
         duration: "",
@@ -91,12 +95,15 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button
-                                variant={plan.popular ? 'primary' : 'secondary'}
-                                className="w-full font-mono uppercase italic tracking-widest text-xs"
+                            <Link
+                                href={plan.price === 'CUSTOM' ? '/build' : `/checkout?plan=${plan.id}`}
+                                className={`block w-full text-center py-4 rounded-xl font-mono uppercase italic tracking-widest text-xs transition-all duration-300 ${plan.popular
+                                        ? 'bg-neon text-ocean-950 hover:bg-white'
+                                        : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
+                                    }`}
                             >
                                 {plan.price === 'CUSTOM' ? 'Request Intel' : 'Initialize Plan'}
-                            </Button>
+                            </Link>
 
                             {/* Decorative background badge */}
                             <div className="absolute -bottom-10 -right-10 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700">
