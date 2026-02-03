@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-12-18.acacia',
+    typescript: true,
 });
 
 // Price IDs - you'll need to create these in Stripe Dashboard
@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
             expand: ['latest_invoice.payment_intent'],
         });
 
-        const invoice = subscription.latest_invoice as Stripe.Invoice;
-        const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+        const invoice = subscription.latest_invoice as any;
+        const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
 
         return NextResponse.json({
             subscriptionId: subscription.id,
