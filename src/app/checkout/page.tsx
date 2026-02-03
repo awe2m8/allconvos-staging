@@ -110,16 +110,42 @@ function CheckoutForm() {
                 return;
             }
 
-            // TODO: Send to backend to create subscription
-            // For now, show success message
-            console.log("Payment method created:", paymentMethod.id);
-            console.log("Plan:", currentPlan.id);
-            console.log("Customer:", formData);
+            // Call our API to create the subscription
+            const response = await fetch('/api/create-subscription', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    paymentMethodId: paymentMethod.id,
+                    planId: currentPlan.id,
+                    email: formData.email,
+                    name: formData.fullName,
+                    company: formData.company,
+                }),
+            });
 
-            alert(`Payment method created successfully! ID: ${paymentMethod.id}\n\nTo complete the subscription, configure the backend API with your Stripe Secret Key.`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(data.error || "Failed to create subscription");
+                setIsLoading(false);
+                return;
+            }
+
+            // If subscription requires confirmation
+            if (data.clientSecret) {
+                const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret);
+                if (confirmError) {
+                    setError(confirmError.message || "Payment confirmation failed");
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            // Success! Redirect to success page or show message
+            window.location.href = `/checkout/success?plan=${currentPlan.id}`;
 
         } catch (err) {
-            setError("An unexpected error occurred");
+            setError("An unexpected error occurred. Please try again.");
             console.error(err);
         }
 
@@ -163,8 +189,8 @@ function CheckoutForm() {
                                         whileTap={{ scale: 0.99 }}
                                         onClick={() => setSelectedPlan(plan.id)}
                                         className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${selectedPlan === plan.id
-                                                ? `${plan.color} bg-white/5`
-                                                : "border-white/10 hover:border-white/20"
+                                            ? `${plan.color} bg-white/5`
+                                            : "border-white/10 hover:border-white/20"
                                             }`}
                                     >
                                         <div className="flex items-start gap-4">
