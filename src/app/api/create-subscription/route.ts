@@ -108,8 +108,15 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             subscriptionId: subscription.id,
-            clientSecret: paymentIntent?.client_secret,
+            clientSecret: paymentIntent?.client_secret || null, // Force null if undefined
             status: subscription.status,
+            debug: {
+                invoiceId: invoice.id,
+                invoiceStatus: invoice.status,
+                paymentIntentId: typeof paymentIntent === 'object' ? paymentIntent?.id : paymentIntent,
+                paymentIntentStatus: typeof paymentIntent === 'object' ? paymentIntent?.status : 'unknown_or_string',
+                originalInvoicePaymentIntent: (subscription.latest_invoice as any)?.payment_intent
+            }
         });
 
     } catch (error) {
