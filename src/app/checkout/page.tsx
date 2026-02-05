@@ -13,6 +13,7 @@ const plans = [
         id: "lite",
         name: "LITE_DEPLOYMENT",
         price: 199,
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_LITE, // Used for display logic if needed later
         priceDisplay: "$199",
         duration: "/mo",
         description: "Single-agent mission for small shops.",
@@ -63,6 +64,7 @@ function CheckoutForm() {
     const [selectedPlan, setSelectedPlan] = useState(initialPlan);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showConfirmation, setShowConfirmation] = useState(false);
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -84,23 +86,31 @@ function CheckoutForm() {
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!stripe || !elements) {
+        if (!stripe || !elements) return;
+
+        // Basic validation
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) {
+            setError("Card element not found");
             return;
         }
+
+        // Show confirmation modal instead of submitting immediately
+        setShowConfirmation(true);
+    };
+
+    const processPayment = async () => {
+        if (!stripe || !elements) return;
 
         setIsLoading(true);
         setError(null);
+        setShowConfirmation(false);
 
         const cardElement = elements.getElement(CardElement);
-
-        if (!cardElement) {
-            setError("Card element not found");
-            setIsLoading(false);
-            return;
-        }
+        if (!cardElement) return;
 
         try {
             // Create a payment method
@@ -135,26 +145,34 @@ function CheckoutForm() {
             const data = await response.json();
 
             if (!response.ok) {
-                setError(data.error || "Failed to create subscription");
-                setIsLoading(false);
+                throw new Error(data.error || "Failed to create subscription");
+            }
+
+            // If subscription requires confirmation (SCA or incomplete status)
+            if (data.status === 'incomplete' && data.clientSecret) {
+                const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret);
+
+                if (confirmError) {
+                    throw new Error(confirmError.message || "Payment confirmation failed");
+                }
+
+                // If confirmation succeeded, we are good!
+                if (paymentIntent?.status === 'succeeded' || paymentIntent?.status === 'processing') {
+                    window.location.href = `/checkout/success?plan=${currentPlan.id}`;
+                    return;
+                }
+            } else if (data.status === 'active') {
+                // Immediate success
+                window.location.href = `/checkout/success?plan=${currentPlan.id}`;
+                return;
+            } else {
+                // Fallback for weird states
+                window.location.href = `/checkout/success?plan=${currentPlan.id}&status=${data.status}`;
                 return;
             }
 
-            // If subscription requires confirmation
-            if (data.clientSecret) {
-                const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret);
-                if (confirmError) {
-                    setError(confirmError.message || "Payment confirmation failed");
-                    setIsLoading(false);
-                    return;
-                }
-            }
-
-            // Success! Redirect to success page or show message
-            window.location.href = `/checkout/success?plan=${currentPlan.id}`;
-
-        } catch (err) {
-            setError("An unexpected error occurred. Please try again.");
+        } catch (err: any) {
+            setError(err.message || "An unexpected error occurred. Please try again.");
             console.error(err);
         }
 
@@ -163,6 +181,55 @@ function CheckoutForm() {
 
     return (
         <main className="min-h-screen bg-ocean-950 relative">
+            {/* Confirmation Modal */}
+            {showConfirmation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-ocean-900 border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-neon/5 rounded-full blur-[80px] pointer-events-none" />
+
+                        <h3 className="text-2xl font-bold text-white mb-6 relative z-10">Confirm Subscription</h3>
+
+                        <div className="space-y-4 mb-8 relative z-10">
+                            <div className="flex justify-between items-center py-3 border-b border-white/5">
+                                <span className="text-gray-400">Plan</span>
+                                <span className="text-white font-mono font-bold">{currentPlan.name}</span>
+                            </div>
+                            <div className="flex justify-between items-center py-3 border-b border-white/5">
+                                <span className="text-gray-400">Billing Cycle</span>
+                                <span className="text-white">Monthly</span>
+                            </div>
+                            <div className="flex justify-between items-center py-3 border-b border-white/5">
+                                <span className="text-gray-400">Total Due Today</span>
+                                <span className="text-neon text-xl font-bold">{currentPlan.priceDisplay}</span>
+                            </div>
+                            <div className="pt-2">
+                                <p className="text-xs text-gray-500">
+                                    By clicking confirm, you agree to be charged {currentPlan.priceDisplay} immediately and then monthly until cancelled.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4 relative z-10">
+                            <button
+                                onClick={() => setShowConfirmation(false)}
+                                className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 transition-colors font-bold text-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={processPayment}
+                                className="flex-1 px-4 py-3 rounded-xl bg-neon text-ocean-950 font-bold text-sm hover:bg-white transition-colors"
+                            >
+                                Confirm & Pay
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
             {/* Background Decor */}
             <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-neon/5 rounded-full blur-[150px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
@@ -244,8 +311,9 @@ function CheckoutForm() {
                             </div>
                         </div>
 
+
                         {/* Customer Details */}
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleFormSubmit} className="space-y-6">
                             <div>
                                 <h2 className="text-white font-bold text-lg mb-4">
                                     Your Details
