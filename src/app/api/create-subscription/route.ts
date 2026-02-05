@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
         const invoice = await stripe.invoices.retrieve(invoiceId, {
             expand: ['payment_intent']
-        });
+        }) as any;
 
         let paymentIntent = invoice.payment_intent as string | Stripe.PaymentIntent | null;
 
