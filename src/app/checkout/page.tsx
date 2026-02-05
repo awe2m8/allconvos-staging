@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Shield, ArrowLeft, Loader2, CreditCard } from "lucide-react";
 import Link from "next/link";
@@ -68,6 +68,12 @@ function CheckoutForm() {
         email: "",
         company: "",
     });
+
+    useEffect(() => {
+        if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+            setError("Configuration Error: Stripe Publishable Key is missing. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to Vercel environment variables.");
+        }
+    }, []);
 
     const currentPlan = plans.find(p => p.id === selectedPlan) || plans[1];
 
