@@ -75,27 +75,48 @@ export async function POST(request: NextRequest) {
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price: priceId }],
-            default_payment_method: paymentMethodId, // Explicitly attach the payment method
+            default_payment_method: paymentMethodId,
             payment_behavior: 'default_incomplete',
             collection_method: 'charge_automatically',
             expand: ['latest_invoice.payment_intent'],
         });
 
-        // Force retrieval of the invoice to ensure we have the latest status
-        const invoiceId = typeof subscription.latest_invoice === 'string'
-            ? subscription.latest_invoice
-            : (subscription.latest_invoice as Stripe.Invoice).id;
+        // Step 1: Check what we got from the subscription creation
+        const latestInvoice = subscription.latest_invoice;
+        const isExpanded = typeof latestInvoice !== 'string';
 
-        const invoice = await stripe.invoices.retrieve(invoiceId, {
-            expand: ['payment_intent']
-        }) as any;
+        let paymentIntent: Stripe.PaymentIntent | null = null;
+        let invoiceAmountDue = 0;
+        let invoiceId = '';
 
-        let paymentIntent = invoice.payment_intent as string | Stripe.PaymentIntent | null;
+        if (isExpanded && latestInvoice) {
+            const invoice = latestInvoice as any;
+            invoiceId = invoice.id;
+            invoiceAmountDue = invoice.amount_due || 0;
 
-        // CRITICAL FIX: Even with expand, sometimes specifically in certain API versions 
-        // or mock environments, this remains an ID. We must check.
-        if (typeof paymentIntent === 'string') {
-            paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent);
+            // Try to get PI directly from the expanded invoice
+            const piFromExpansion = invoice.payment_intent;
+
+            if (typeof piFromExpansion === 'object' && piFromExpansion !== null) {
+                paymentIntent = piFromExpansion as Stripe.PaymentIntent;
+            } else if (typeof piFromExpansion === 'string') {
+                // Expansion returned just an ID, retrieve the full object
+                paymentIntent = await stripe.paymentIntents.retrieve(piFromExpansion);
+            }
+        } else if (typeof latestInvoice === 'string') {
+            // Expansion failed completely, retrieve invoice manually
+            invoiceId = latestInvoice;
+            const invoice = await stripe.invoices.retrieve(latestInvoice, {
+                expand: ['payment_intent']
+            }) as any;
+            invoiceAmountDue = invoice.amount_due || 0;
+
+            const piFromRetrieval = invoice.payment_intent;
+            if (typeof piFromRetrieval === 'object' && piFromRetrieval !== null) {
+                paymentIntent = piFromRetrieval as Stripe.PaymentIntent;
+            } else if (typeof piFromRetrieval === 'string') {
+                paymentIntent = await stripe.paymentIntents.retrieve(piFromRetrieval);
+            }
         }
 
         console.log('Subscription created:', {
@@ -107,14 +128,16 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             subscriptionId: subscription.id,
-            clientSecret: paymentIntent?.client_secret || null, // Force null if undefined
+            clientSecret: paymentIntent?.client_secret || null,
             status: subscription.status,
             debug: {
-                invoiceId: invoice.id,
-                invoiceStatus: invoice.status,
-                invoiceCollectionMethod: invoice.collection_method,
-                paymentIntentId: paymentIntent ? paymentIntent.id : (paymentIntent === null ? 'NULL' : 'UNDEFINED'),
-                paymentIntentStatus: typeof paymentIntent === 'object' && paymentIntent ? paymentIntent.status : 'unknown',
+                step1_isInvoiceExpanded: isExpanded,
+                invoiceId: invoiceId,
+                invoiceAmountDue: invoiceAmountDue,
+                paymentIntentId: paymentIntent ? paymentIntent.id : 'NONE',
+                paymentIntentStatus: paymentIntent ? paymentIntent.status : 'NONE',
+                rawLatestInvoiceType: typeof subscription.latest_invoice,
+                rawPiOnInvoice: isExpanded ? typeof (subscription.latest_invoice as any)?.payment_intent : 'N/A',
             }
         });
 
