@@ -82,8 +82,19 @@ export async function POST(request: NextRequest) {
             expand: ['latest_invoice.payment_intent'],
         });
 
-        const invoice = subscription.latest_invoice as any;
-        const paymentIntent = invoice?.payment_intent as Stripe.PaymentIntent;
+        let invoice = subscription.latest_invoice as any;
+
+        // If expansion failed and we got an ID, retrieve the invoice
+        if (typeof invoice === 'string') {
+            invoice = await stripe.invoices.retrieve(invoice);
+        }
+
+        let paymentIntent = invoice?.payment_intent as any;
+
+        // If invoice expansion failed and we got an ID, or if we just need to retrieve it
+        if (typeof paymentIntent === 'string') {
+            paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent);
+        }
 
         console.log('Subscription created:', {
             id: subscription.id,
