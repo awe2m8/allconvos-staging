@@ -71,73 +71,76 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Create the subscription
+        // Create the subscription with expanded fields
         const subscription = await stripe.subscriptions.create({
             customer: customer.id,
             items: [{ price: priceId }],
             default_payment_method: paymentMethodId,
             payment_behavior: 'default_incomplete',
             collection_method: 'charge_automatically',
-            expand: ['latest_invoice.payment_intent'],
+            expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
         });
 
-        // Step 1: Check what we got from the subscription creation
-        const latestInvoice = subscription.latest_invoice;
-        const isExpanded = typeof latestInvoice !== 'string';
+        // With default_incomplete, Stripe may use:
+        // 1. subscription.pending_setup_intent (for SetupIntent flow)
+        // 2. invoice.payment_intent (for PaymentIntent flow)
+        // We need to check BOTH and use whichever has a client_secret
 
-        let paymentIntent: Stripe.PaymentIntent | null = null;
-        let invoiceAmountDue = 0;
-        let invoiceId = '';
+        let clientSecret: string | null = null;
+        let secretSource = 'NONE';
 
-        if (isExpanded && latestInvoice) {
-            const invoice = latestInvoice as any;
-            invoiceId = invoice.id;
-            invoiceAmountDue = invoice.amount_due || 0;
-
-            // Try to get PI directly from the expanded invoice
-            const piFromExpansion = invoice.payment_intent;
-
-            if (typeof piFromExpansion === 'object' && piFromExpansion !== null) {
-                paymentIntent = piFromExpansion as Stripe.PaymentIntent;
-            } else if (typeof piFromExpansion === 'string') {
-                // Expansion returned just an ID, retrieve the full object
-                paymentIntent = await stripe.paymentIntents.retrieve(piFromExpansion);
-            }
-        } else if (typeof latestInvoice === 'string') {
-            // Expansion failed completely, retrieve invoice manually
-            invoiceId = latestInvoice;
-            const invoice = await stripe.invoices.retrieve(latestInvoice, {
-                expand: ['payment_intent']
-            }) as any;
-            invoiceAmountDue = invoice.amount_due || 0;
-
-            const piFromRetrieval = invoice.payment_intent;
-            if (typeof piFromRetrieval === 'object' && piFromRetrieval !== null) {
-                paymentIntent = piFromRetrieval as Stripe.PaymentIntent;
-            } else if (typeof piFromRetrieval === 'string') {
-                paymentIntent = await stripe.paymentIntents.retrieve(piFromRetrieval);
+        // Check 1: subscription.pending_setup_intent (SetupIntent for 3D Secure / validation)
+        const pendingSetupIntent = (subscription as any).pending_setup_intent;
+        if (pendingSetupIntent) {
+            if (typeof pendingSetupIntent === 'object' && pendingSetupIntent.client_secret) {
+                clientSecret = pendingSetupIntent.client_secret;
+                secretSource = 'subscription.pending_setup_intent';
+            } else if (typeof pendingSetupIntent === 'string') {
+                // It's just an ID, retrieve the full object
+                const si = await stripe.setupIntents.retrieve(pendingSetupIntent);
+                clientSecret = si.client_secret;
+                secretSource = 'subscription.pending_setup_intent (retrieved)';
             }
         }
+
+        // Check 2: invoice.payment_intent (PaymentIntent for immediate charge)
+        if (!clientSecret) {
+            const latestInvoice = subscription.latest_invoice as any;
+            if (latestInvoice && typeof latestInvoice === 'object') {
+                const pi = latestInvoice.payment_intent;
+                if (pi && typeof pi === 'object' && pi.client_secret) {
+                    clientSecret = pi.client_secret;
+                    secretSource = 'invoice.payment_intent';
+                } else if (typeof pi === 'string') {
+                    const paymentIntent = await stripe.paymentIntents.retrieve(pi);
+                    clientSecret = paymentIntent.client_secret;
+                    secretSource = 'invoice.payment_intent (retrieved)';
+                }
+            }
+        }
+
+        // Debug info
+        const latestInvoice = subscription.latest_invoice as any;
 
         console.log('Subscription created:', {
             id: subscription.id,
             status: subscription.status,
-            paymentIntentId: paymentIntent?.id,
-            hasClientSecret: !!paymentIntent?.client_secret
+            clientSecretSource: secretSource,
+            hasClientSecret: !!clientSecret
         });
 
         return NextResponse.json({
             subscriptionId: subscription.id,
-            clientSecret: paymentIntent?.client_secret || null,
+            clientSecret: clientSecret,
             status: subscription.status,
             debug: {
-                step1_isInvoiceExpanded: isExpanded,
-                invoiceId: invoiceId,
-                invoiceAmountDue: invoiceAmountDue,
-                paymentIntentId: paymentIntent ? paymentIntent.id : 'NONE',
-                paymentIntentStatus: paymentIntent ? paymentIntent.status : 'NONE',
-                rawLatestInvoiceType: typeof subscription.latest_invoice,
-                rawPiOnInvoice: isExpanded ? typeof (subscription.latest_invoice as any)?.payment_intent : 'N/A',
+                secretSource: secretSource,
+                invoiceId: latestInvoice?.id || 'NONE',
+                invoiceAmountDue: latestInvoice?.amount_due || 0,
+                hasPendingSetupIntent: !!pendingSetupIntent,
+                pendingSetupIntentType: typeof pendingSetupIntent,
+                hasPaymentIntent: !!(latestInvoice?.payment_intent),
+                paymentIntentType: typeof latestInvoice?.payment_intent,
             }
         });
 
