@@ -184,7 +184,7 @@ export default function TestGraphicsPage() {
 
                 {/* ===== VARIATION 7: Wide Banner Style ===== */}
                 <section className="space-y-4">
-                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 7 - Wide Banner (for full-width forms)</p>
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 7 - Wide Banner (Original)</p>
                     <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 p-6 rounded-2xl border border-white/10">
                         <div className="flex items-center justify-between gap-6">
                             <p className="font-mono text-lg font-bold tracking-tighter text-white">
@@ -200,6 +200,138 @@ export default function TestGraphicsPage() {
                                 TEST FREE
                             </p>
                         </div>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 8: Banner + Tagline ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 8 - Banner + Tagline</p>
+                    <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 py-8 px-6 rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-between gap-6 mb-4">
+                            <p className="font-mono text-lg font-bold tracking-tighter text-white">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+                            <div className="flex-1 text-center">
+                                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">
+                                    <span className="text-white">CREATE YOUR AI </span>
+                                    <span className="text-neon italic">RECEPTIONIST</span>
+                                </h2>
+                            </div>
+                            <p className="text-sm font-bold text-neon italic uppercase tracking-tight">
+                                TEST FREE
+                            </p>
+                        </div>
+                        <p className="text-center text-gray-500 text-sm">
+                            Tell us about your business. We'll build your AI agent and call you.
+                        </p>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 9: Banner + Subtitle ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 9 - Banner + Subtitle Row</p>
+                    <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 py-6 px-6 rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-between gap-6">
+                            <p className="font-mono text-lg font-bold tracking-tighter text-white">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+                            <div className="flex-1 text-center">
+                                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">
+                                    <span className="text-white">CREATE YOUR AI </span>
+                                    <span className="text-neon italic">RECEPTIONIST</span>
+                                </h2>
+                            </div>
+                            <p className="text-sm font-bold text-neon italic uppercase tracking-tight">
+                                TEST FREE
+                            </p>
+                        </div>
+                        <div className="h-px bg-white/10 my-4" />
+                        <p className="text-center text-gray-400 text-sm font-medium">
+                            Describe your business → We build your agent → Call you to test it live
+                        </p>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 10: Build Your Voice Agent ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 10 - "Build Your Voice Agent"</p>
+                    <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 p-6 rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-between gap-6">
+                            <p className="font-mono text-lg font-bold tracking-tighter text-white">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+                            <div className="flex-1 text-center">
+                                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">
+                                    <span className="text-white">BUILD YOUR </span>
+                                    <span className="text-neon italic">VOICE AGENT</span>
+                                </h2>
+                            </div>
+                            <p className="text-sm font-bold text-white/50 italic uppercase tracking-tight">
+                                IN MINUTES
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 11: AI Phone Answering ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 11 - "AI Phone Answering"</p>
+                    <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 p-6 rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-between gap-6">
+                            <p className="font-mono text-lg font-bold tracking-tighter text-white">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+                            <div className="flex-1 text-center">
+                                <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">
+                                    <span className="text-white">AI </span>
+                                    <span className="text-neon italic">PHONE ANSWERING</span>
+                                </h2>
+                            </div>
+                            <p className="text-sm font-bold text-neon italic uppercase tracking-tight">
+                                TRY IT NOW
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 12: Taller with Description ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 12 - Taller with Description</p>
+                    <div className="bg-gradient-to-r from-ocean-950 via-ocean-900 to-ocean-950 py-10 px-8 rounded-2xl border border-white/10">
+                        <div className="flex items-center justify-between gap-6 mb-6">
+                            <p className="font-mono text-xl font-bold tracking-tighter text-white">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+                            <p className="text-sm font-bold text-neon italic uppercase tracking-tight">
+                                FREE TRIAL
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4">
+                                <span className="text-white">CREATE YOUR AI </span>
+                                <span className="text-neon italic">RECEPTIONIST</span>
+                            </h2>
+                            <p className="text-gray-400 text-base max-w-lg mx-auto">
+                                Tell us about your business. We'll build your AI agent and call you to test it.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== VARIATION 13: Centered Stack ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Variation 13 - Centered Stack</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 py-10 px-8 rounded-2xl border border-white/10 text-center">
+                        <p className="font-mono text-lg font-bold tracking-tighter text-white mb-6">
+                            allconvos<span className="text-neon">_</span>
+                        </p>
+                        <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-2">
+                            <span className="text-white">CREATE YOUR AI </span>
+                            <span className="text-neon italic">RECEPTIONIST</span>
+                        </h2>
+                        <p className="text-neon font-bold italic uppercase text-sm tracking-widest">
+                            — TEST IT FREE —
+                        </p>
                     </div>
                 </section>
 
