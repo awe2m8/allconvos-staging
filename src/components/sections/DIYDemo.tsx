@@ -152,7 +152,7 @@ export function DIYDemo() {
                                                     <iframe
                                                         src="https://iframes.ai/o/1770341151771x557178828267716600?color=11eddd&icon="
                                                         allow="microphone https://iframes.ai; camera https://iframes.ai; autoplay *; encrypted-media *; fullscreen *; display-capture *; picture-in-picture *; clipboard-read *; clipboard-write *;"
-                                                        style={{ width: "120px", height: "120px", border: "none", borderRadius: "50%", marginTop: "-10px" }}
+                                                        style={{ width: "120px", height: "120px", border: "none", borderRadius: "50%", transform: "translateY(-10px)" }}
                                                         id="assistantFrame"
                                                         title="AI Voice Assistant"
                                                     />
