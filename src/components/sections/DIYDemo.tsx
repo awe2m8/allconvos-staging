@@ -130,7 +130,7 @@ export function DIYDemo() {
                                                 whileTap={{ scale: 0.98 }}
                                                 className="mt-10 w-full bg-white text-black py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-neon transition-all duration-300 shadow-[0_20px_40px_rgba(0,0,0,0.3)]"
                                             >
-                                                Start Live Demo
+                                                Start Live Web Demo
                                                 <ArrowRight className="w-5 h-5" />
                                             </motion.button>
                                         </motion.div>
@@ -152,7 +152,7 @@ export function DIYDemo() {
                                                     <iframe
                                                         src="https://iframes.ai/o/1770341151771x557178828267716600?color=11eddd&icon="
                                                         allow="microphone https://iframes.ai; camera https://iframes.ai; autoplay *; encrypted-media *; fullscreen *; display-capture *; picture-in-picture *; clipboard-read *; clipboard-write *;"
-                                                        style={{ width: "120px", height: "120px", border: "none", borderRadius: "50%" }}
+                                                        style={{ width: "120px", height: "120px", border: "none", borderRadius: "50%", marginTop: "10px" }}
                                                         id="assistantFrame"
                                                         title="AI Voice Assistant"
                                                     />
