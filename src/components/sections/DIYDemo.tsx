@@ -142,22 +142,33 @@ export function DIYDemo() {
                                             exit={{ opacity: 0, y: -10 }}
                                             className="relative z-10 flex flex-col items-center w-full"
                                         >
-                                            <div className="w-full bg-ocean-900 shadow-[inset_0_0_40px_rgba(0,0,0,0.4)] rounded-2xl border border-white/5 p-4 mb-6">
-                                                <iframe
-                                                    src="https://iframes.ai/o/1770334150828x100437170360156160?color=1adef1&icon="
-                                                    allow="microphone https://iframes.ai; camera https://iframes.ai; autoplay *; encrypted-media *; fullscreen *; display-capture *; picture-in-picture *; clipboard-read *; clipboard-write *;"
-                                                    style={{ width: "100%", height: "200px", border: "none" }}
-                                                    id="assistantFrame"
-                                                    title="AI Voice Assistant"
-                                                />
+                                            {/* Button-styled orb container */}
+                                            <div className="relative group cursor-pointer">
+                                                {/* Outer glow ring */}
+                                                <div className="absolute -inset-4 bg-gradient-to-r from-neon/20 via-cyan-400/20 to-neon/20 rounded-full blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+
+                                                {/* Button frame */}
+                                                <div className="relative bg-gradient-to-b from-ocean-800 to-ocean-900 rounded-full p-6 border-2 border-neon/30 shadow-[0_0_40px_rgba(26,222,241,0.2)] group-hover:border-neon/60 group-hover:shadow-[0_0_60px_rgba(26,222,241,0.4)] transition-all duration-300">
+                                                    <iframe
+                                                        src="https://iframes.ai/o/1770341151771x557178828267716600?color=11eddd&icon="
+                                                        allow="microphone https://iframes.ai; camera https://iframes.ai; autoplay *; encrypted-media *; fullscreen *; display-capture *; picture-in-picture *; clipboard-read *; clipboard-write *;"
+                                                        style={{ width: "120px", height: "120px", border: "none", borderRadius: "50%" }}
+                                                        id="assistantFrame"
+                                                        title="AI Voice Assistant"
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div className="text-center space-y-4">
-                                                <p className="text-[10px] font-mono text-neon uppercase tracking-[0.2em] animate-pulse">
-                                                    Neural_Link_Established
+                                            {/* Label below the orb-button */}
+                                            <div className="text-center space-y-3 mt-8">
+                                                <p className="text-white font-black uppercase tracking-[0.15em] text-sm">
+                                                    Click to Start Call
                                                 </p>
-                                                <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-[280px]">
-                                                    Browser microphone access required. Click "Start Call" inside the widget to begin.
+                                                <p className="text-[10px] font-mono text-neon uppercase tracking-[0.2em] animate-pulse">
+                                                    Voice_Link_Active
+                                                </p>
+                                                <p className="text-gray-500 text-xs font-medium leading-relaxed max-w-[280px]">
+                                                    Click the orb above and allow microphone access
                                                 </p>
 
                                                 <button
