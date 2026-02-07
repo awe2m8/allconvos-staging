@@ -35,25 +35,49 @@ export default function BuildPage() {
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             // Log all messages for debugging
-            console.log('PostMessage received:', event.data);
+            console.log('PostMessage received:', event.origin, event.data);
+
+            // Check if message is from GoHighLevel/LeadConnector
+            const isFromGHL = event.origin?.includes('leadconnector') ||
+                event.origin?.includes('gohighlevel') ||
+                event.origin?.includes('msgsndr');
 
             // GoHighLevel sends various messages - check for form submission indicators
             if (event.data) {
                 const data = event.data;
+                const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
+
                 // Check for common form submission message types
                 if (typeof data === 'object') {
+                    // Direct match on known properties
                     if (data.type === 'form_submitted' ||
                         data.action === 'submit' ||
                         data.formSubmitted === true ||
                         data.event === 'form_submitted' ||
                         data.type === 'submit' ||
-                        data.message === 'form_submitted') {
+                        data.message === 'form_submitted' ||
+                        data.status === 'success' ||
+                        data.submitted === true) {
+                        console.log('Form submission detected via object property');
                         handleFormSubmitted();
+                        return;
+                    }
+
+                    // Check for height changes or resize events that might indicate form completion
+                    if (isFromGHL && (data.type === 'resize' || data.height)) {
+                        // GHL often sends resize events when form state changes
+                        console.log('GHL resize event detected - might be form completion');
                     }
                 }
-                // Check string messages
-                if (typeof data === 'string' && (data.includes('submit') || data.includes('success'))) {
+
+                // Check string messages or stringified data for keywords
+                if (dataStr.toLowerCase().includes('submit') ||
+                    dataStr.toLowerCase().includes('success') ||
+                    dataStr.toLowerCase().includes('thank') ||
+                    dataStr.toLowerCase().includes('complete')) {
+                    console.log('Form submission detected via keyword in message');
                     handleFormSubmitted();
+                    return;
                 }
             }
         };
