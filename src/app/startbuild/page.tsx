@@ -18,11 +18,22 @@ export default function StartBuildPage() {
                 className="relative z-10 w-full max-w-lg"
             >
                 {/* Main Card */}
-                <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 overflow-hidden shadow-2xl relative">
                     {/* Gradient flourish bar */}
-                    <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
 
-                    <div className="p-8 text-center">
+                    {/* AI Analyst Avatar - Top Center */}
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20">
+                        <div className="w-24 h-24 rounded-full border-2 border-neon bg-black p-1 shadow-[0_0_25px_rgba(0,255,255,0.4)]">
+                            <img
+                                src="/images/ai-avatar.png"
+                                alt="AI Analyst"
+                                className="w-full h-full rounded-full object-cover"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="px-8 pb-8 pt-36 text-center">
                         {/* Logo */}
                         <p className="font-mono text-lg font-bold tracking-tighter text-white mb-6">
                             allconvos<span className="text-neon">_</span>

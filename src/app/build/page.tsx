@@ -132,14 +132,25 @@ export default function BuildPage() {
                             {/* Builder Container */}
                             <div className="flex-1 bg-black/20 p-8 flex flex-col items-center justify-center min-h-[360px]">
                                 <div
-                                    className="w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 cursor-pointer hover:border-neon/30 transition-colors"
+                                    className="relative w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 cursor-pointer hover:border-neon/30 transition-colors group"
                                     onClick={() => setShowPopup(true)}
                                 >
+                                    {/* AI Analyst Avatar */}
+                                    <div className="absolute top-4 right-4 z-10">
+                                        <div className="relative w-12 h-12 rounded-full border border-neon/50 bg-black overflow-hidden shadow-[0_0_15px_rgba(0,255,255,0.3)] group-hover:scale-105 transition-transform duration-300">
+                                            <img
+                                                src="/images/ai-avatar.png"
+                                                alt="AI Analyst"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    </div>
+
                                     <iframe
                                         ref={frameRef}
                                         src="https://iframes.ai/o/1769747339624x746533060485054500?color=d6fa12&icon="
                                         allow="microphone"
-                                        className="w-full h-[200px] border-none pointer-events-none"
+                                        className="w-full h-[200px] border-none pointer-events-none relative z-0"
                                         id="assistantFrame"
                                         title="Agent Builder"
                                     />
