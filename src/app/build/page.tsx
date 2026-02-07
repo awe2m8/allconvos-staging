@@ -131,23 +131,30 @@ export default function BuildPage() {
 
                             {/* Builder Container */}
                             <div className="flex-1 bg-black/20 p-8 flex flex-col items-center justify-center min-h-[360px]">
+                                {/* Header Section: Avatar & Text */}
+                                <div className="text-center mb-10 relative z-20">
+                                    <div className="w-24 h-24 mx-auto rounded-full border-2 border-neon bg-black p-1 shadow-[0_0_25px_rgba(0,255,255,0.4)] mb-6 cursor-pointer hover:scale-105 transition-transform duration-300" onClick={() => setShowPopup(true)}>
+                                        <img
+                                            src="/images/ai-avatar.png"
+                                            alt="AI Analyst"
+                                            className="w-full h-full rounded-full object-cover"
+                                        />
+                                    </div>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tight mb-2">
+                                        Let's Build!
+                                    </h2>
+                                    <p className="text-neon font-bold italic uppercase text-sm tracking-widest">
+                                        Click the Floating Orb to start
+                                    </p>
+                                </div>
+
+                                {/* Orb Widget Frame */}
                                 <div
-                                    className="relative w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] pt-32 pb-6 px-6 cursor-pointer hover:border-neon/30 transition-colors group"
+                                    className="relative w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 cursor-pointer hover:border-neon/30 transition-colors group"
                                     onClick={() => setShowPopup(true)}
                                 >
-                                    {/* Gradient Head Line */}
+                                    {/* Gradient Flourish Line */}
                                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon via-cyan-400 to-neon opacity-50" />
-
-                                    {/* AI Analyst Avatar - Top Center */}
-                                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                                        <div className="w-20 h-20 rounded-full border-2 border-neon bg-black p-1 shadow-[0_0_20px_rgba(0,255,255,0.4)] group-hover:scale-105 transition-transform duration-300">
-                                            <img
-                                                src="/images/ai-avatar.png"
-                                                alt="AI Analyst"
-                                                className="w-full h-full rounded-full object-cover"
-                                            />
-                                        </div>
-                                    </div>
 
                                     <iframe
                                         ref={frameRef}
