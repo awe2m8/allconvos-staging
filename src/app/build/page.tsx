@@ -217,13 +217,13 @@ export default function BuildPage() {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-xl"
+                            className="relative w-full max-w-2xl bg-ocean-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            {/* Close button - floating over form */}
+                            {/* Close button */}
                             <button
                                 onClick={() => setShowPopup(false)}
-                                className="absolute -top-2 -right-2 z-20 p-2 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 transition-colors"
+                                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                             >
                                 <X className="w-5 h-5 text-white" />
                             </button>
