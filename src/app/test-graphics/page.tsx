@@ -438,6 +438,157 @@ export default function TestGraphicsPage() {
                     </div>
                 </section>
 
+                {/* ========================================= */}
+                {/* POST-FORM SUBMISSION POPUP GRAPHICS */}
+                {/* ========================================= */}
+                <div className="pt-8 border-t border-white/10">
+                    <h2 className="text-xl font-bold text-white mb-2">Post-Form Submission Popups</h2>
+                    <p className="text-gray-500 text-sm mb-8">Square-shaped messages for after form submission</p>
+                </div>
+
+                {/* ===== POST-FORM 1: Basic with Orb ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Post-Form 1 - Basic with Orb</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 text-center overflow-hidden max-w-md mx-auto">
+                        <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                        <div className="py-10 px-8">
+                            <p className="font-mono text-base font-bold tracking-tighter text-white mb-6">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+
+                            {/* Orb visual */}
+                            <div className="w-20 h-20 rounded-full border-4 border-neon flex items-center justify-center bg-ocean-900 shadow-[0_0_40px_rgba(217,255,65,0.3)] mx-auto mb-6">
+                                <Mic className="w-8 h-8 text-neon" />
+                            </div>
+
+                            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-4">
+                                You're Ready to Build Your Agent
+                            </h2>
+                            <p className="text-neon font-bold italic uppercase text-sm tracking-widest mb-4">
+                                Click the Floating Orb
+                            </p>
+                            <p className="text-gray-400 text-sm font-medium tracking-wide">
+                                Describe your business → We build your agent → We send it to you to test
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== POST-FORM 2: Larger Orb ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Post-Form 2 - Larger Orb</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 text-center overflow-hidden max-w-md mx-auto">
+                        <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                        <div className="py-10 px-8">
+                            {/* Large Orb visual */}
+                            <div className="relative mx-auto mb-6 w-28 h-28">
+                                <div className="absolute inset-0 bg-neon/20 rounded-full blur-xl animate-pulse" />
+                                <div className="relative w-28 h-28 rounded-full border-4 border-neon flex items-center justify-center bg-ocean-900 shadow-[0_0_50px_rgba(217,255,65,0.4)]">
+                                    <Mic className="w-10 h-10 text-neon" />
+                                </div>
+                            </div>
+
+                            <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
+                                You're Ready!
+                            </h2>
+                            <p className="text-neon font-bold italic uppercase text-sm tracking-widest mb-4">
+                                Click the Floating Orb to Start
+                            </p>
+                            <p className="text-gray-400 text-sm font-medium tracking-wide">
+                                Describe your business → We build your agent → We send it to you to test
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== POST-FORM 3: Compact ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Post-Form 3 - Compact</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 text-center overflow-hidden max-w-sm mx-auto">
+                        <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                        <div className="py-8 px-6">
+                            <div className="flex items-center justify-center gap-4 mb-4">
+                                <div className="w-14 h-14 rounded-full border-3 border-neon flex items-center justify-center bg-ocean-900 shadow-[0_0_30px_rgba(217,255,65,0.3)]">
+                                    <Mic className="w-6 h-6 text-neon" />
+                                </div>
+                                <div className="text-left">
+                                    <h2 className="text-lg font-black text-white uppercase tracking-tight">
+                                        You're Ready!
+                                    </h2>
+                                    <p className="text-neon font-bold italic text-xs uppercase tracking-wide">
+                                        Click the Orb →
+                                    </p>
+                                </div>
+                            </div>
+                            <p className="text-gray-500 text-xs font-medium">
+                                Describe your business → We build → We send it to you
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== POST-FORM 4: Full Instructions ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Post-Form 4 - Full Instructions</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 text-center overflow-hidden max-w-md mx-auto">
+                        <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                        <div className="py-10 px-8">
+                            <p className="font-mono text-base font-bold tracking-tighter text-white mb-4">
+                                allconvos<span className="text-neon">_</span>
+                            </p>
+
+                            <h2 className="text-2xl font-black text-neon uppercase tracking-tight mb-6">
+                                ✓ Details Saved!
+                            </h2>
+
+                            {/* Orb with arrow */}
+                            <div className="relative mx-auto mb-6">
+                                <div className="w-24 h-24 rounded-full border-4 border-neon flex items-center justify-center bg-ocean-900 shadow-[0_0_40px_rgba(217,255,65,0.3)] mx-auto">
+                                    <Mic className="w-10 h-10 text-neon" />
+                                </div>
+                                <p className="text-white font-black text-lg mt-4">Click the Floating Orb</p>
+                            </div>
+
+                            <div className="space-y-2 text-left max-w-xs mx-auto">
+                                <p className="text-gray-400 text-sm">
+                                    <span className="text-neon font-bold">1.</span> Describe your business
+                                </p>
+                                <p className="text-gray-400 text-sm">
+                                    <span className="text-neon font-bold">2.</span> We build your agent
+                                </p>
+                                <p className="text-gray-400 text-sm">
+                                    <span className="text-neon font-bold">3.</span> We send it to you to test
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ===== POST-FORM 5: Minimal with Glow ===== */}
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Post-Form 5 - Minimal with Glow</p>
+                    <div className="bg-gradient-to-b from-ocean-900 to-ocean-950 rounded-2xl border border-white/10 text-center overflow-hidden max-w-sm mx-auto">
+                        <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
+                        <div className="py-10 px-6">
+                            {/* Glowing Orb */}
+                            <div className="relative mx-auto mb-6 w-24 h-24">
+                                <div className="absolute inset-0 bg-neon/30 rounded-full blur-2xl" />
+                                <div className="absolute inset-2 bg-neon/20 rounded-full blur-lg animate-pulse" />
+                                <div className="relative w-24 h-24 rounded-full border-4 border-neon flex items-center justify-center bg-ocean-950">
+                                    <Mic className="w-10 h-10 text-neon" />
+                                </div>
+                            </div>
+
+                            <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2">
+                                Now Click the Orb
+                            </h2>
+                            <p className="text-gray-500 text-sm">
+                                to build your AI voice agent
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Instructions */}
                 <div className="p-6 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
                     <p className="font-bold text-white mb-2">📸 How to use:</p>

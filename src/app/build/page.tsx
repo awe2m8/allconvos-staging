@@ -12,7 +12,42 @@ import { Pricing } from "../../components/sections/Pricing";
 export default function BuildPage() {
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+    const [formSubmitted, setFormSubmitted] = useState(false);
     const frameRef = useRef<HTMLIFrameElement>(null);
+
+    // Check if form was previously submitted (persisted in localStorage)
+    useEffect(() => {
+        const submitted = localStorage.getItem('allconvos_form_submitted');
+        if (submitted === 'true') {
+            setFormSubmitted(true);
+        }
+    }, []);
+
+    // Handle form submission - mark as submitted and enable orb
+    const handleFormSubmitted = () => {
+        localStorage.setItem('allconvos_form_submitted', 'true');
+        setFormSubmitted(true);
+        setShowPopup(false);
+    };
+
+    // Listen for messages from GoHighLevel form iframe
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            // GoHighLevel sends various messages - check for form submission indicators
+            if (event.data && typeof event.data === 'object') {
+                // Check for common form submission message types
+                if (event.data.type === 'form_submitted' ||
+                    event.data.action === 'submit' ||
+                    event.data.formSubmitted === true ||
+                    (typeof event.data === 'string' && event.data.includes('submit'))) {
+                    handleFormSubmitted();
+                }
+            }
+        };
+
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
 
     useEffect(() => {
         const checkPermissions = () => {
@@ -132,14 +167,14 @@ export default function BuildPage() {
                             {/* Builder Container */}
                             <div className="flex-1 bg-black/20 p-8 flex flex-col items-center justify-center min-h-[360px]">
                                 <div
-                                    className="w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 cursor-pointer hover:border-neon/30 transition-colors"
-                                    onClick={() => setShowPopup(true)}
+                                    className={`w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 ${!formSubmitted ? 'cursor-pointer hover:border-neon/30' : ''} transition-colors`}
+                                    onClick={() => !formSubmitted && setShowPopup(true)}
                                 >
                                     <iframe
                                         ref={frameRef}
                                         src="https://iframes.ai/o/1769747339624x746533060485054500?color=d6fa12&icon="
                                         allow="microphone"
-                                        className="w-full h-[200px] border-none pointer-events-none"
+                                        className={`w-full h-[200px] border-none ${formSubmitted ? '' : 'pointer-events-none'}`}
                                         id="assistantFrame"
                                         title="Agent Builder"
                                     />
@@ -235,6 +270,16 @@ export default function BuildPage() {
                                 id="inline-kTciuwAyNYWItRrsMHEN"
                                 title="Free Agent Build & Test"
                             />
+
+                            {/* Manual form submitted button */}
+                            <div className="p-3 bg-ocean-950 border-t border-white/10 flex justify-center">
+                                <button
+                                    onClick={handleFormSubmitted}
+                                    className="text-xs font-mono text-gray-500 hover:text-neon transition-colors uppercase tracking-wider"
+                                >
+                                    Already submitted? Click here to continue →
+                                </button>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}
