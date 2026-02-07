@@ -12,6 +12,7 @@ import { Pricing } from "../../components/sections/Pricing";
 export default function BuildPage() {
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+    const [popupView, setPopupView] = useState<'form' | 'orb'>('form');
     const [formSubmitted, setFormSubmitted] = useState(false);
     const frameRef = useRef<HTMLIFrameElement>(null);
 
@@ -23,11 +24,11 @@ export default function BuildPage() {
         }
     }, []);
 
-    // Handle form submission - mark as submitted and enable orb
+    // Handle form submission - mark as submitted and show orb popup
     const handleFormSubmitted = () => {
         localStorage.setItem('allconvos_form_submitted', 'true');
         setFormSubmitted(true);
-        setShowPopup(false);
+        setPopupView('orb'); // Switch to orb view instead of closing
     };
 
     // Listen for messages from GoHighLevel form iframe
@@ -245,8 +246,8 @@ export default function BuildPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-1.5 bg-black/80 backdrop-blur-sm"
-                        onClick={() => setShowPopup(false)}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                        onClick={() => { setShowPopup(false); setPopupView('form'); }}
                     >
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -257,29 +258,50 @@ export default function BuildPage() {
                         >
                             {/* Close button */}
                             <button
-                                onClick={() => setShowPopup(false)}
+                                onClick={() => { setShowPopup(false); setPopupView('form'); }}
                                 className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
                             >
                                 <X className="w-5 h-5 text-white" />
                             </button>
 
-                            {/* Form iframe */}
-                            <iframe
-                                src="https://api.leadconnectorhq.com/widget/form/kTciuwAyNYWItRrsMHEN"
-                                style={{ width: "100%", height: "575px", border: "none", borderRadius: "10px" }}
-                                id="inline-kTciuwAyNYWItRrsMHEN"
-                                title="Free Agent Build & Test"
-                            />
+                            {popupView === 'form' ? (
+                                /* Form View */
+                                <iframe
+                                    src="https://api.leadconnectorhq.com/widget/form/kTciuwAyNYWItRrsMHEN"
+                                    style={{ width: "100%", height: "575px", border: "none", borderRadius: "10px" }}
+                                    id="inline-kTciuwAyNYWItRrsMHEN"
+                                    title="Free Agent Build & Test"
+                                />
+                            ) : (
+                                /* Orb View - Post-Form Submission */
+                                <div className="text-center">
+                                    {/* Gradient flourish bar */}
+                                    <div className="h-2 bg-gradient-to-r from-neon via-cyan-400 to-neon" />
 
-                            {/* Manual form submitted button */}
-                            <div className="p-3 bg-ocean-950 border-t border-white/10 flex justify-center">
-                                <button
-                                    onClick={handleFormSubmitted}
-                                    className="text-xs font-mono text-gray-500 hover:text-neon transition-colors uppercase tracking-wider"
-                                >
-                                    Already submitted? Click here to continue →
-                                </button>
-                            </div>
+                                    <div className="py-8 px-8">
+                                        <h2 className="text-3xl font-black text-white uppercase tracking-tight mb-2">
+                                            You're Ready!
+                                        </h2>
+                                        <p className="text-neon font-bold italic uppercase text-sm tracking-widest mb-6">
+                                            Click the Floating Orb to Start
+                                        </p>
+
+                                        {/* Interactive Orb iFrame */}
+                                        <div className="bg-ocean-950 rounded-2xl p-4 mb-6">
+                                            <iframe
+                                                src="https://iframes.ai/o/1769747339624x746533060485054500?color=d6fa12&icon="
+                                                allow="microphone"
+                                                className="w-full h-[200px] border-none"
+                                                title="Voice Agent Orb"
+                                            />
+                                        </div>
+
+                                        <p className="text-gray-400 text-sm font-medium tracking-wide">
+                                            Describe your business → We build your agent → We send it to you to test
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}
