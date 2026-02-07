@@ -132,16 +132,19 @@ export default function BuildPage() {
                             {/* Builder Container */}
                             <div className="flex-1 bg-black/20 p-8 flex flex-col items-center justify-center min-h-[360px]">
                                 <div
-                                    className="relative w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] p-6 cursor-pointer hover:border-neon/30 transition-colors group"
+                                    className="relative w-full max-w-md bg-ocean-800/50 border border-white/5 rounded-2xl overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] pt-32 pb-6 px-6 cursor-pointer hover:border-neon/30 transition-colors group"
                                     onClick={() => setShowPopup(true)}
                                 >
-                                    {/* AI Analyst Avatar */}
-                                    <div className="absolute top-4 right-4 z-10">
-                                        <div className="relative w-12 h-12 rounded-full border border-neon/50 bg-black overflow-hidden shadow-[0_0_15px_rgba(0,255,255,0.3)] group-hover:scale-105 transition-transform duration-300">
+                                    {/* Gradient Head Line */}
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon via-cyan-400 to-neon opacity-50" />
+
+                                    {/* AI Analyst Avatar - Top Center */}
+                                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+                                        <div className="w-20 h-20 rounded-full border-2 border-neon bg-black p-1 shadow-[0_0_20px_rgba(0,255,255,0.4)] group-hover:scale-105 transition-transform duration-300">
                                             <img
                                                 src="/images/ai-avatar.png"
                                                 alt="AI Analyst"
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full rounded-full object-cover"
                                             />
                                         </div>
                                     </div>
