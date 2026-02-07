@@ -354,12 +354,27 @@ export default function BuildPage() {
 
                             {popupView === 'form' ? (
                                 /* Form View */
-                                <iframe
-                                    src="https://api.leadconnectorhq.com/widget/form/kTciuwAyNYWItRrsMHEN"
-                                    style={{ width: "100%", height: "575px", border: "none", borderRadius: "10px" }}
-                                    id="inline-kTciuwAyNYWItRrsMHEN"
-                                    title="Free Agent Build & Test"
-                                />
+                                <div>
+                                    <iframe
+                                        src="https://api.leadconnectorhq.com/widget/form/kTciuwAyNYWItRrsMHEN"
+                                        style={{ width: "100%", height: "575px", border: "none", borderRadius: "10px" }}
+                                        id="inline-kTciuwAyNYWItRrsMHEN"
+                                        title="Free Agent Build & Test"
+                                    />
+                                    {/* Continue button - appears below form */}
+                                    <div className="p-4 bg-ocean-950 border-t border-white/10">
+                                        <button
+                                            onClick={handleFormSubmitted}
+                                            className="w-full py-4 px-6 bg-neon text-ocean-950 font-black text-lg uppercase tracking-tight rounded-xl hover:bg-neon/90 transition-colors flex items-center justify-center gap-3"
+                                        >
+                                            <span>Continue to Build Your Agent</span>
+                                            <span className="text-2xl">→</span>
+                                        </button>
+                                        <p className="text-center text-gray-500 text-xs mt-2 font-mono">
+                                            Click after submitting the form above
+                                        </p>
+                                    </div>
+                                </div>
                             ) : (
                                 /* Orb View - Post-Form Submission */
                                 <div className="text-center">
