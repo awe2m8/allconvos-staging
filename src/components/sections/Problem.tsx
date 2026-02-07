@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingDown, RefreshCcw, BellOff, XCircle, AlertTriangle } from "lucide-react";
+import { TrendingDown, RefreshCcw, BellOff, XCircle, AlertTriangle, Terminal, Activity } from "lucide-react";
 
 export function Problem() {
     const painPoints = [
@@ -106,10 +106,124 @@ export function Problem() {
                     <p className="text-white text-lg font-bold italic tracking-tight">
                         "I WAS MISSING 3-4 CALLS A DAY WHILE ON SITE. SINCE STARTING WITH ALLCONVOS, EVERY SINGLE ONE OF THOSE IS NOW A PITCH OR A BOOKING."
                     </p>
-                    <div className="mt-4 text-neon font-mono text-xs tracking-widest uppercase">
-                        — MIKE T., PLUMBING & GAS SPECIALISTS
-                    </div>
                 </motion.div>
+
+                {/* PROTOTYPE TO PRODUCTION SECTION */}
+                <div className="mt-32 border-t border-white/5 pt-32">
+                    <div className="text-center mb-16">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="inline-block bg-white/5 border border-white/10 rounded-full px-4 py-1 mb-6"
+                        >
+                            <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">Succession_Plan</span>
+                        </motion.div>
+
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.1 }}
+                            className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tighter uppercase italic"
+                        >
+                            PROTOTYPE TO <span className="text-neon">PRODUCTION.</span>
+                        </motion.h2>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                            className="text-gray-400 font-mono text-sm uppercase tracking-widest"
+                        >
+                            // From free testing to professional grade deployment
+                        </motion.p>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-6 mb-16">
+                        {/* Card 1: Free Build & Test */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                            className="bg-ocean-900/50 border border-white/5 rounded-2xl p-8 hover:border-blue-500/30 transition-colors group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-transparent opacity-50" />
+                            <div className="mb-6">
+                                <Terminal className="w-8 h-8 text-blue-400 mb-6" />
+                                <h3 className="text-xl font-bold text-white mb-2 italic uppercase">Free Build & Test</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    Prototype your agent's core logic here for free. Experience the latency and response style instantly.
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+                                <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Status</span>
+                                <span className="text-[10px] font-mono text-blue-400 uppercase tracking-widest font-bold">Available Now</span>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 2: Technical Refinement */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                            className="bg-ocean-900/50 border border-white/5 rounded-2xl p-8 hover:border-neon/30 transition-colors group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-neon to-transparent opacity-50" />
+                            <div className="mb-6">
+                                <div className="w-8 h-8 text-neon mb-6">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><path d="M15 2v2" /><path d="M15 20v2" /><path d="M2 15h2" /><path d="M2 9h2" /><path d="M20 15h2" /><path d="M20 9h2" /><path d="M9 2v2" /><path d="M9 20v2" /></svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2 italic uppercase">Technical Refinement</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    Once you're ready, we take over. Our engineers refine the prompt engineering, voice modulation, and AI guardrails.
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+                                <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Status</span>
+                                <span className="text-[10px] font-mono text-neon uppercase tracking-widest font-bold">Expert Phase</span>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 3: Full-Scale Deployment */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                            className="bg-ocean-900/50 border border-white/5 rounded-2xl p-8 hover:border-purple-500/30 transition-colors group relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-transparent opacity-50" />
+                            <div className="mb-6">
+                                <Activity className="w-8 h-8 text-purple-400 mb-6" />
+                                <h3 className="text-xl font-bold text-white mb-2 italic uppercase">Full-Scale Deployment</h3>
+                                <p className="text-gray-400 text-sm leading-relaxed">
+                                    We attach a dedicated Australian business number, sync with your CRM (HighLevel, etc.), and link your calendar.
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
+                                <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">Status</span>
+                                <span className="text-[10px] font-mono text-purple-400 uppercase tracking-widest font-bold">Production Ready</span>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.6 }}
+                        className="text-center"
+                    >
+                        <a href="/build" className="inline-flex items-center gap-2 bg-neon text-ocean-950 px-8 py-4 rounded-xl font-mono uppercase font-bold tracking-wider hover:bg-white transition-colors group">
+                            Build your agent now
+                            <TrendingDown className="w-4 h-4 rotate-[-90deg] group-hover:translate-x-1 transition-transform" />
+                        </a>
+                    </motion.div>
+                </div>
             </div>
         </section>
     );
