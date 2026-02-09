@@ -8,6 +8,7 @@ import Script from "next/script";
 import { Button } from "../../components/ui/Button";
 import { BuildNextSteps } from "../../components/sections/BuildNextSteps";
 import { Pricing } from "../../components/sections/Pricing";
+import { Footer } from "../../components/Footer";
 
 export default function BuildPage() {
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
@@ -265,6 +266,8 @@ export default function BuildPage() {
 
             {/* Lead Connector Script */}
             <Script src="https://link.msgsndr.com/js/form_embed.js" strategy="lazyOnload" />
+
+            <Footer />
         </main>
     );
 }
