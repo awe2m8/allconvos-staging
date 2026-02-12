@@ -102,7 +102,7 @@ export function Pricing() {
                                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                {plan.price === 'CUSTOM' ? 'Request Intel' : 'Initialize Plan'}
+                                {plan.price === 'CUSTOM' ? 'Request Intel' : (plan.id === 'lite' ? 'Start Receptionist Setup' : 'Initialize Plan')}
                             </Link>
 
                             {/* Decorative background badge */}
