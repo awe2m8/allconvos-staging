@@ -11,7 +11,7 @@ const plans = [
         name: "LITE_DEPLOYMENT",
         price: "$399",
         duration: "/mo",
-        description: "Single-agent mission for small shops.",
+        description: "One receptionist. Fully autonomous. Always on.",
         features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications"],
         color: "text-blue-400",
         bg: "bg-blue-400/5",
