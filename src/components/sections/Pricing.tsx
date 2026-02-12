@@ -9,7 +9,7 @@ const plans = [
     {
         id: "lite",
         name: "LITE_DEPLOYMENT",
-        price: "$199",
+        price: "$399",
         duration: "/mo",
         description: "Single-agent mission for small shops.",
         features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications"],
