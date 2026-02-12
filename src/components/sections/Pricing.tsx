@@ -23,7 +23,16 @@ const plans = [
         price: "$599",
         duration: "/mo",
         description: "Handles leads from calls, SMS and web forms — end to end. (Includes Voice AI Receptionist)",
-        features: ["Unlimited AI Agents", "Deep Calendar Integration", "CRM Sync (HighLevel, etc)", "Priority System Support", "Everything in Lite"],
+        features: [
+            "Multi agents",
+            "Calls + SMS + web forms included",
+            "Lead capture + instant responses",
+            "Automatic qualification + tagging",
+            "Ongoing follow-up & nurturing",
+            "CRM sync (HighLevel, etc.)",
+            "Priority support",
+            "Everything in Front Desk"
+        ],
         color: "text-neon",
         bg: "bg-neon/10",
         border: "border-neon/40",
