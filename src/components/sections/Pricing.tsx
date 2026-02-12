@@ -19,10 +19,10 @@ const plans = [
     },
     {
         id: "pro",
-        name: "PRO_STRATEGY",
-        price: "$499",
+        name: "LEAD_ENGINE",
+        price: "$599",
         duration: "/mo",
-        description: "Full-scale mission control. Our most popular.",
+        description: "Handles leads from calls, SMS and web forms — end to end. (Includes Voice AI Receptionist)",
         features: ["Unlimited AI Agents", "Deep Calendar Integration", "CRM Sync (HighLevel, etc)", "Priority System Support", "Everything in Lite"],
         color: "text-neon",
         bg: "bg-neon/10",
@@ -102,7 +102,7 @@ export function Pricing() {
                                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                {plan.price === 'CUSTOM' ? 'Request Intel' : (plan.id === 'lite' ? 'Start Receptionist Setup' : 'Initialize Plan')}
+                                {plan.price === 'CUSTOM' ? 'Request Intel' : (plan.id === 'lite' ? 'Start Receptionist Setup' : (plan.id === 'pro' ? 'Start Pro' : 'Initialize Plan'))}
                             </Link>
 
                             {/* Decorative background badge */}
