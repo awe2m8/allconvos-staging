@@ -2,7 +2,7 @@ export const PLAN_IDS = ["lite", "pro"] as const;
 
 export type PlanId = (typeof PLAN_IDS)[number];
 
-export const DEFAULT_PLAN_ID: PlanId = "pro";
+export const DEFAULT_PLAN_ID: PlanId = "lite";
 
 export const PLAN_DETAILS: Record<PlanId, {
   name: string;

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { OnboardingChecklist } from "@/components/app/OnboardingChecklist";
 import { getOrCreateOnboardingProgress } from "@/lib/onboarding";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
-import { PLAN_DETAILS, normalizePlanId } from "@/lib/billing";
+import { DEFAULT_PLAN_ID, PLAN_DETAILS, normalizePlanId } from "@/lib/billing";
 import { appUrl } from "@/lib/siteUrls";
 
 export default async function OnboardingPage() {
@@ -15,7 +15,7 @@ export default async function OnboardingPage() {
 
   const subscription = await getLatestSubscriptionForUser(userId);
   if (!subscription || !isActiveSubscriptionStatus(subscription.status)) {
-    redirect(appUrl("/billing/checkout?plan=pro"));
+    redirect(appUrl(`/billing/checkout?plan=${DEFAULT_PLAN_ID}`));
   }
 
   const onboardingProgress = await getOrCreateOnboardingProgress(userId);
