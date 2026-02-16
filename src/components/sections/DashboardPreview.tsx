@@ -1,9 +1,27 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Activity, Phone, Target, Cpu, TrendingUp, Search, Calendar, Filter, ChevronDown, MoreHorizontal } from "lucide-react";
 
 export function DashboardPreview() {
+    const chartBars = useMemo(
+        () =>
+            Array.from({ length: 24 }, (_, i) => {
+                const noise = (offset: number) => {
+                    const seed = Math.sin((i + 1) * 12.9898 + offset) * 43758.5453;
+                    return seed - Math.floor(seed);
+                };
+
+                const h1 = 20 + noise(0.31) * 150;
+                const h2 = 10 + noise(1.73) * 80;
+                const h3 = 5 + noise(2.47) * 40;
+
+                return { h1, h2, h3 };
+            }),
+        []
+    );
+
     return (
         <section className="py-24 bg-ocean-950 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -158,10 +176,7 @@ export function DashboardPreview() {
                             </div>
 
                             <div className="h-[280px] w-full flex items-end justify-between gap-1 md:gap-4 px-4 overflow-hidden">
-                                {[...Array(24)].map((_, i) => {
-                                    const h1 = 20 + Math.random() * 150;
-                                    const h2 = 10 + Math.random() * 80;
-                                    const h3 = 5 + Math.random() * 40;
+                                {chartBars.map(({ h1, h2, h3 }, i) => {
                                     return (
                                         <div key={i} className="flex-1 flex flex-col justify-end gap-[2px] group relative">
                                             {/* Stacked bar visualization */}

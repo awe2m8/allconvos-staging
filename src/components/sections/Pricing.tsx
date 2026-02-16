@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ShieldCheck, Zap, Globe, MessageSquare } from "lucide-react";
-import { Button } from "../ui/Button";
+import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 const plans = [
@@ -11,8 +10,9 @@ const plans = [
         name: "FRONT_DESK_CORE",
         price: "$399",
         duration: "/mo",
+        onboardingNote: "+ One-time onboarding fee (tailored)",
         description: "One receptionist. Fully autonomous. Always on.",
-        features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications"],
+        features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications", "+ One-time onboarding fee (tailored)"],
         color: "text-blue-400",
         bg: "bg-blue-400/5",
         border: "border-blue-400/20"
@@ -22,6 +22,7 @@ const plans = [
         name: "LEAD_ENGINE",
         price: "$599",
         duration: "/mo",
+        onboardingNote: "+ One-time onboarding fee (tailored)",
         description: "Handles leads from calls, SMS and web forms — end to end. (Includes Voice AI Receptionist)",
         features: [
             "Multi agents",
@@ -31,7 +32,8 @@ const plans = [
             "Ongoing follow-up & nurturing",
             "CRM sync (HighLevel, etc.)",
             "Priority support",
-            "Everything in Front Desk"
+            "Everything in Front Desk",
+            "+ One-time onboarding fee (tailored)"
         ],
         color: "text-neon",
         bg: "bg-neon/10",
@@ -44,7 +46,7 @@ const plans = [
         price: "CUSTOM",
         duration: "",
         description: "multi-location enterprise operations.",
-        features: ["Multi-Agent Orchestration", "Predictive Analytics", "Dedicated Mission Support", "Custom API Integrations", "Full System Overseer"],
+        features: ["Multi-Agent Orchestration", "Predictive Analytics", "Dedicated Mission Support", "Custom API Integrations", "Full System Overseer", "+ One-time onboarding fee (tailored)"],
         color: "text-purple-400",
         bg: "bg-purple-400/5",
         border: "border-purple-400/20"
@@ -60,7 +62,7 @@ export function Pricing() {
                         INVESTMENT <span className="text-white/20">/</span> SCALE
                     </h2>
                     <p className="text-gray-400 max-w-2xl mx-auto font-mono text-sm uppercase tracking-widest">
-                        // Choose your level of operational perfection
+                        Choose your level of operational perfection
                     </p>
                 </div>
 
@@ -82,11 +84,16 @@ export function Pricing() {
 
                             <div className="mb-8">
                                 <h3 className={`text-sm font-mono font-bold uppercase tracking-[0.3em] ${plan.color} mb-4`}>
-                                    // {plan.name}
+                                    {plan.name}
                                 </h3>
                                 <div className="flex items-baseline gap-1 mb-2">
                                     <span className="text-5xl font-bold text-white tracking-tighter">{plan.price}</span>
                                     <span className="text-gray-500 font-mono text-xs">{plan.duration}</span>
+                                    {"onboardingNote" in plan && (
+                                        <span className="ml-2 relative -top-[15px] text-[10px] font-mono uppercase tracking-wide text-gray-400">
+                                            {plan.onboardingNote}
+                                        </span>
+                                    )}
                                 </div>
                                 <p className="text-gray-400 font-mono text-[10px] uppercase leading-relaxed tracking-wider">
                                     {plan.description}

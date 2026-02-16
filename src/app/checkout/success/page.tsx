@@ -7,8 +7,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const planNames: Record<string, string> = {
-    lite: "LITE_DEPLOYMENT",
-    pro: "PRO_STRATEGY",
+    lite: "FRONT_DESK_CORE",
+    pro: "LEAD_ENGINE",
 };
 
 function SuccessContent() {
@@ -38,7 +38,7 @@ function SuccessContent() {
                     </h1>
 
                     <p className="text-gray-400 text-lg mb-2">
-                        Your subscription to <span className="text-white font-bold">{planName.replace("_", " ")}</span> is now active.
+                        Your subscription to <span className="text-white font-bold">{planName.replaceAll("_", " ")}</span> is now active.
                     </p>
 
                     <p className="text-gray-500 text-sm">

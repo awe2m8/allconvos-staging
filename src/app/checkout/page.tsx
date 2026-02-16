@@ -8,16 +8,25 @@ import { useSearchParams } from "next/navigation";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import stripePromise from "@/lib/stripe";
 
+type ConfirmationType = "payment_intent" | "setup_intent" | null;
+
+interface CreateSubscriptionResponse {
+    subscriptionId: string;
+    clientSecret: string | null;
+    confirmationType: ConfirmationType;
+    status: string;
+    error?: string;
+}
+
 const plans = [
     {
         id: "lite",
         name: "FRONT_DESK_CORE",
         price: 399,
-        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_LITE, // Used for display logic if needed later
         priceDisplay: "$399",
         duration: "/mo",
         description: "One receptionist. Fully autonomous. Always on.",
-        features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications"],
+        features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications", "+ One-time onboarding fee (tailored)"],
         color: "border-blue-400",
         accent: "text-blue-400",
     },
@@ -36,7 +45,8 @@ const plans = [
             "Ongoing follow-up & nurturing",
             "CRM sync (HighLevel, etc.)",
             "Priority support",
-            "Everything in Front Desk"
+            "Everything in Front Desk",
+            "+ One-time onboarding fee (tailored)"
         ],
         color: "border-neon",
         accent: "text-neon",
@@ -119,7 +129,11 @@ function CheckoutForm() {
         setShowConfirmation(false);
 
         const cardElement = elements.getElement(CardElement);
-        if (!cardElement) return;
+        if (!cardElement) {
+            setError("Card element not found");
+            setIsLoading(false);
+            return;
+        }
 
         try {
             // Create a payment method
@@ -151,7 +165,7 @@ function CheckoutForm() {
                 }),
             });
 
-            const data = await response.json();
+            const data: CreateSubscriptionResponse = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.error || "Failed to create subscription");
@@ -159,12 +173,31 @@ function CheckoutForm() {
 
             // If subscription requires confirmation (SCA or incomplete status)
             if (data.status === 'incomplete') {
-                if (!data.clientSecret) {
+                if (!data.clientSecret || !data.confirmationType) {
                     // Debug: Show detailed info to diagnose why secret is missing
                     throw new Error(`Payment setup failed. Server Ref: ${data.subscriptionId} Status: ${data.status}. Secrets: ${data.clientSecret ? 'YES' : 'NO'}. Data: ${JSON.stringify(data)}`);
                 }
 
-                const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret);
+                if (data.confirmationType === "setup_intent") {
+                    const { error: confirmError, setupIntent } = await stripe.confirmCardSetup(data.clientSecret, {
+                        payment_method: paymentMethod.id,
+                    });
+
+                    if (confirmError) {
+                        throw new Error(confirmError.message || "Payment method confirmation failed");
+                    }
+
+                    if (setupIntent?.status === "succeeded" || setupIntent?.status === "processing") {
+                        window.location.href = `/checkout/success?plan=${currentPlan.id}`;
+                        return;
+                    }
+
+                    throw new Error(`Payment method status: ${setupIntent?.status}`);
+                }
+
+                const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+                    payment_method: paymentMethod.id,
+                });
 
                 if (confirmError) {
                     throw new Error(confirmError.message || "Payment confirmation failed");
@@ -186,8 +219,9 @@ function CheckoutForm() {
                 throw new Error("Subscription created but payment status is unknown. Please check your email.");
             }
 
-        } catch (err: any) {
-            setError(err.message || "An unexpected error occurred. Please try again.");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "An unexpected error occurred. Please try again.";
+            setError(message);
             console.error(err);
         }
 
