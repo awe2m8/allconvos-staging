@@ -6,6 +6,7 @@ import { PlanId } from "@/lib/billing";
 
 interface CheckoutButtonProps {
   planId: PlanId;
+  label?: string;
 }
 
 interface CheckoutResponse {
@@ -13,7 +14,7 @@ interface CheckoutResponse {
   error?: string;
 }
 
-export function CheckoutButton({ planId }: CheckoutButtonProps) {
+export function CheckoutButton({ planId, label }: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,7 +63,7 @@ export function CheckoutButton({ planId }: CheckoutButtonProps) {
             Redirecting...
           </>
         ) : (
-          "Continue to Secure Checkout"
+          label ?? "Continue to Secure Checkout"
         )}
       </button>
 
