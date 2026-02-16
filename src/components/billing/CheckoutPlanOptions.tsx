@@ -6,14 +6,22 @@ import { DEFAULT_PLAN_ID, PLAN_DETAILS, PlanId } from "@/lib/billing";
 
 interface CheckoutPlanOptionsProps {
   requestedPlan: PlanId;
+  showOnlyRequested?: boolean;
 }
 
-export function CheckoutPlanOptions({ requestedPlan }: CheckoutPlanOptionsProps) {
+export function CheckoutPlanOptions({
+  requestedPlan,
+  showOnlyRequested = false,
+}: CheckoutPlanOptionsProps) {
   const [activePlan, setActivePlan] = useState<PlanId | null>(null);
 
   const planOrder: PlanId[] = useMemo(() => {
+    if (showOnlyRequested) {
+      return [requestedPlan];
+    }
+
     return requestedPlan === "pro" ? ["pro", "lite"] : ["lite", "pro"];
-  }, [requestedPlan]);
+  }, [requestedPlan, showOnlyRequested]);
 
   return (
     <div className="grid md:grid-cols-2 gap-5">
@@ -21,7 +29,7 @@ export function CheckoutPlanOptions({ requestedPlan }: CheckoutPlanOptionsProps)
         const plan = PLAN_DETAILS[planId];
         const isPreferred = planId === requestedPlan;
         const isDefault = planId === DEFAULT_PLAN_ID;
-        const isDisabled = activePlan !== null && activePlan !== planId;
+        const isDisabled = !showOnlyRequested && activePlan !== null && activePlan !== planId;
 
         return (
           <section

@@ -1,5 +1,4 @@
 import { SignUp } from "@clerk/nextjs";
-import { normalizePlanId } from "@/lib/billing";
 import { appUrl } from "@/lib/siteUrls";
 
 interface SignUpPageProps {
@@ -20,9 +19,12 @@ function readSingleParam(raw: string | string[] | undefined): string | undefined
 
 export default async function SignUpPage({ searchParams }: SignUpPageProps) {
   const params = await searchParams;
-  const planId = normalizePlanId(readSingleParam(params.plan));
-  const fallbackRedirectUrl = appUrl(`/start?plan=${planId}`);
-  const signInUrl = appUrl(`/login?plan=${planId}`);
+  const rawPlan = readSingleParam(params.plan);
+  const hasExplicitPlan = rawPlan === "lite" || rawPlan === "pro";
+  const fallbackRedirectUrl = hasExplicitPlan
+    ? appUrl(`/start?plan=${rawPlan}`)
+    : appUrl("/app/onboarding");
+  const signInUrl = hasExplicitPlan ? appUrl(`/login?plan=${rawPlan}`) : appUrl("/login");
 
   return (
     <main className="min-h-screen bg-ocean-950 flex items-center justify-center px-6 py-20">
