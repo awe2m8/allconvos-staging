@@ -88,3 +88,14 @@ export function shouldRedirectToAppOrigin({
 
   return appHost !== incomingHost;
 }
+
+export function isRequestOnAppOrigin(requestHost: string | null): boolean {
+  if (!requestHost) {
+    return false;
+  }
+
+  const appHost = normalizeHost(new URL(getAppOrigin()).host);
+  const incomingHost = normalizeHost(requestHost);
+
+  return appHost === incomingHost;
+}

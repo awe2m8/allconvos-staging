@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { appUrl, shouldRedirectToAppOrigin } from "@/lib/siteUrls";
+import { appUrl, isRequestOnAppOrigin, shouldRedirectToAppOrigin } from "@/lib/siteUrls";
 
 const isProtectedRoute = createRouteMatcher([
   "/app(.*)",
@@ -11,6 +11,16 @@ const isProtectedRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, request) => {
   const requestHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    request.nextUrl.pathname === "/" &&
+    isRequestOnAppOrigin(requestHost)
+  ) {
+    const { userId } = await auth();
+    return NextResponse.redirect(appUrl(userId ? "/app/onboarding" : "/login"), 307);
+  }
+
   if (
     shouldRedirectToAppOrigin({
       requestPathname: request.nextUrl.pathname,
