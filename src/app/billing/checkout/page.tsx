@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckoutButton } from "@/components/billing/CheckoutButton";
-import { DEFAULT_PLAN_ID, PLAN_DETAILS, PlanId, normalizePlanId } from "@/lib/billing";
+import { CheckoutPlanOptions } from "@/components/billing/CheckoutPlanOptions";
+import { normalizePlanId } from "@/lib/billing";
 import { appUrl, marketingUrl } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 
@@ -25,7 +25,6 @@ function readSingleParam(raw: string | string[] | undefined): string | undefined
 export default async function BillingCheckoutPage({ searchParams }: BillingCheckoutPageProps) {
   const params = await searchParams;
   const requestedPlan = normalizePlanId(readSingleParam(params.plan));
-  const planOrder: PlanId[] = requestedPlan === "pro" ? ["pro", "lite"] : ["lite", "pro"];
 
   const { userId } = await auth();
   if (!userId) {
@@ -53,39 +52,7 @@ export default async function BillingCheckoutPage({ searchParams }: BillingCheck
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-5">
-            {planOrder.map((planId) => {
-              const plan = PLAN_DETAILS[planId];
-              const isPreferred = planId === requestedPlan;
-              const isDefault = planId === DEFAULT_PLAN_ID;
-
-              return (
-                <section
-                  key={planId}
-                  className={`rounded-xl border p-5 space-y-4 bg-black/30 ${isPreferred ? "border-neon/50" : "border-white/10"}`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="text-white font-semibold">{plan.name}</p>
-                      <p className="text-gray-400 text-xs">{plan.description}</p>
-                    </div>
-                    {(isPreferred || isDefault) && (
-                      <span className="shrink-0 rounded-full border border-white/15 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wide text-gray-300">
-                        {isPreferred ? "Selected" : "Default"}
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-neon font-bold text-2xl">{plan.monthlyPriceLabel}</p>
-
-                  <CheckoutButton
-                    planId={planId}
-                    label={planId === "lite" ? "Choose Front Desk Core" : "Choose Lead Engine"}
-                  />
-                </section>
-              );
-            })}
-          </div>
+          <CheckoutPlanOptions requestedPlan={requestedPlan} />
 
           <p className="text-[11px] text-gray-500 font-mono">
             By continuing, you will complete payment in Stripe. Your onboarding access is granted after successful payment.

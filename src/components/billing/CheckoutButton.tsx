@@ -7,6 +7,9 @@ import { PlanId } from "@/lib/billing";
 interface CheckoutButtonProps {
   planId: PlanId;
   label?: string;
+  disabled?: boolean;
+  onCheckoutStart?: () => void;
+  onCheckoutEnd?: () => void;
 }
 
 interface CheckoutResponse {
@@ -14,13 +17,24 @@ interface CheckoutResponse {
   error?: string;
 }
 
-export function CheckoutButton({ planId, label }: CheckoutButtonProps) {
+export function CheckoutButton({
+  planId,
+  label,
+  disabled = false,
+  onCheckoutStart,
+  onCheckoutEnd,
+}: CheckoutButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleCheckout() {
+    if (disabled || isLoading) {
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
+    onCheckoutStart?.();
 
     try {
       const response = await fetch("/api/billing/create-checkout-session", {
@@ -46,6 +60,7 @@ export function CheckoutButton({ planId, label }: CheckoutButtonProps) {
       const message = checkoutError instanceof Error ? checkoutError.message : "Could not start checkout";
       setError(message);
       setIsLoading(false);
+      onCheckoutEnd?.();
     }
   }
 
@@ -54,7 +69,7 @@ export function CheckoutButton({ planId, label }: CheckoutButtonProps) {
       <button
         type="button"
         onClick={handleCheckout}
-        disabled={isLoading}
+        disabled={isLoading || disabled}
         className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-4 font-mono uppercase tracking-widest text-xs bg-neon text-ocean-950 hover:bg-white transition-colors disabled:opacity-60"
       >
         {isLoading ? (
