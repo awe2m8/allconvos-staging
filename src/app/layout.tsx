@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
+import { AuthSessionIndicator } from "@/components/auth/AuthSessionIndicator";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,6 +34,7 @@ export default function RootLayout({
       <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} antialiased scroll-smooth`}>
         <body className="relative">
           <CookieConsent />
+          <AuthSessionIndicator />
           {children}
           <Script
             src="https://widgets.leadconnectorhq.com/loader.js"
