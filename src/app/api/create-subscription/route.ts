@@ -8,6 +8,9 @@ const PRICE_IDS = {
 
 type PlanId = keyof typeof PRICE_IDS;
 type ConfirmationType = 'payment_intent' | 'setup_intent';
+type InvoiceWithPaymentIntent = Stripe.Invoice & {
+    payment_intent?: string | Stripe.PaymentIntent | null;
+};
 
 interface CreateSubscriptionBody {
     paymentMethodId?: unknown;
@@ -118,7 +121,7 @@ export async function POST(request: NextRequest) {
 
         const latestInvoice = subscription.latest_invoice;
         if (!clientSecret && latestInvoice && typeof latestInvoice === 'object') {
-            const pi = latestInvoice.payment_intent;
+            const pi = (latestInvoice as InvoiceWithPaymentIntent).payment_intent;
             if (pi && typeof pi === 'object' && pi.client_secret) {
                 clientSecret = pi.client_secret;
                 confirmationType = 'payment_intent';
