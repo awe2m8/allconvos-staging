@@ -4,17 +4,18 @@ import { OnboardingChecklist } from "@/components/app/OnboardingChecklist";
 import { getOrCreateOnboardingProgress } from "@/lib/onboarding";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 import { PLAN_DETAILS, normalizePlanId } from "@/lib/billing";
+import { appUrl } from "@/lib/siteUrls";
 
 export default async function OnboardingPage() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/login");
+    redirect(appUrl("/login"));
   }
 
   const subscription = await getLatestSubscriptionForUser(userId);
   if (!subscription || !isActiveSubscriptionStatus(subscription.status)) {
-    redirect("/billing/checkout?plan=pro");
+    redirect(appUrl("/billing/checkout?plan=pro"));
   }
 
   const onboardingProgress = await getOrCreateOnboardingProgress(userId);

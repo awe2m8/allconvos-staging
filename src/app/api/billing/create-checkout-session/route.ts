@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { normalizePlanId, STRIPE_PRICE_IDS } from "@/lib/billing";
 import { getStripeServerClient } from "@/lib/stripeServer";
+import { getAppOrigin } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser } from "@/lib/subscriptions";
 
 interface CheckoutRequestBody {
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripeServerClient();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
+    const appOrigin = getAppOrigin();
 
     const user = await currentUser();
     const primaryEmailAddressId = user?.primaryEmailAddressId;
@@ -63,8 +64,8 @@ export async function POST(request: NextRequest) {
         enabled: true,
       },
       allow_promotion_codes: true,
-      success_url: `${appUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/billing/checkout?plan=${planId}`,
+      success_url: `${appOrigin}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appOrigin}/billing/checkout?plan=${planId}`,
       client_reference_id: userId,
       metadata: {
         user_id: userId,

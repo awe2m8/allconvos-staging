@@ -17,8 +17,11 @@ Next.js 16 app with:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 
-# App URL for Stripe return URLs
-NEXT_PUBLIC_APP_URL=https://your-domain.com
+# App URL (auth + billing + onboarding domain)
+NEXT_PUBLIC_APP_URL=https://app.your-domain.com
+
+# Optional marketing URL override (defaults to app URL with `app.` removed)
+NEXT_PUBLIC_MARKETING_URL=https://your-domain.com
 
 # Stripe
 STRIPE_SECRET_KEY=

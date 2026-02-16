@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { CheckoutButton } from "@/components/billing/CheckoutButton";
 import { normalizePlanId, PLAN_DETAILS } from "@/lib/billing";
+import { appUrl, marketingUrl } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 
 interface BillingCheckoutPageProps {
@@ -27,12 +28,12 @@ export default async function BillingCheckoutPage({ searchParams }: BillingCheck
 
   const { userId } = await auth();
   if (!userId) {
-    redirect(`/signup?plan=${requestedPlan}`);
+    redirect(appUrl(`/signup?plan=${requestedPlan}`));
   }
 
   const subscription = await getLatestSubscriptionForUser(userId);
   if (subscription && isActiveSubscriptionStatus(subscription.status)) {
-    redirect("/app/onboarding");
+    redirect(appUrl("/app/onboarding"));
   }
 
   const selectedPlan = PLAN_DETAILS[requestedPlan];
@@ -40,7 +41,7 @@ export default async function BillingCheckoutPage({ searchParams }: BillingCheck
   return (
     <main className="min-h-screen bg-ocean-950 py-28 px-6">
       <div className="max-w-2xl mx-auto space-y-8">
-        <Link href="/#pricing" className="text-gray-400 hover:text-white text-sm font-mono">
+        <Link href={marketingUrl("/#pricing")} className="text-gray-400 hover:text-white text-sm font-mono">
           Back to pricing
         </Link>
 

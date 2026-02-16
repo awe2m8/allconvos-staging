@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { normalizePlanId } from "@/lib/billing";
+import { appUrl } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 
 interface StartPageProps {
@@ -25,13 +26,13 @@ export default async function StartPage({ searchParams }: StartPageProps) {
 
   const { userId } = await auth();
   if (!userId) {
-    redirect(`/signup?plan=${planId}`);
+    redirect(appUrl(`/signup?plan=${planId}`));
   }
 
   const subscription = await getLatestSubscriptionForUser(userId);
   if (subscription && isActiveSubscriptionStatus(subscription.status)) {
-    redirect("/app/onboarding");
+    redirect(appUrl("/app/onboarding"));
   }
 
-  redirect(`/billing/checkout?plan=${planId}`);
+  redirect(appUrl(`/billing/checkout?plan=${planId}`));
 }

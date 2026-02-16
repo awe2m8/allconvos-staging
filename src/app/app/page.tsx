@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
+import { appUrl } from "@/lib/siteUrls";
 
 export default function AppHomePage() {
-  redirect("/app/onboarding");
+  redirect(appUrl("/app/onboarding"));
 }

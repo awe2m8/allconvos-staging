@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { appUrl } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 
 export default async function BillingSuccessPage() {
   const { userId } = await auth();
   if (!userId) {
-    redirect("/login");
+    redirect(appUrl("/login"));
   }
 
   const subscription = await getLatestSubscriptionForUser(userId);
@@ -21,7 +22,7 @@ export default async function BillingSuccessPage() {
           <>
             <p className="text-gray-300">Your subscription is active and onboarding is unlocked.</p>
             <Link
-              href="/app/onboarding"
+              href={appUrl("/app/onboarding")}
               className="inline-flex items-center justify-center rounded-xl bg-neon text-ocean-950 px-6 py-3 text-xs font-mono uppercase tracking-widest hover:bg-white transition-colors"
             >
               Continue to onboarding
@@ -33,7 +34,7 @@ export default async function BillingSuccessPage() {
               We&apos;re still waiting on Stripe confirmation. This can take a moment in some payment flows.
             </p>
             <Link
-              href="/billing/checkout"
+              href={appUrl("/billing/checkout")}
               className="inline-flex items-center justify-center rounded-xl border border-white/15 text-white px-6 py-3 text-xs font-mono uppercase tracking-widest hover:bg-white/10 transition-colors"
             >
               Refresh billing status
