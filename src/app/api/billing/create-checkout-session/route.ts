@@ -9,8 +9,18 @@ interface CheckoutRequestBody {
   planId?: unknown;
 }
 
+interface StripeLikeError {
+  message?: string;
+  statusCode?: number;
+  type?: string;
+}
+
 function isNonEmptyString(value: string | null | undefined): value is string {
   return typeof value === "string" && value.length > 0;
+}
+
+function isStripeLikeError(value: unknown): value is StripeLikeError {
+  return typeof value === "object" && value !== null;
 }
 
 export async function POST(request: NextRequest) {
@@ -20,10 +30,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let attemptedPlanId: string | undefined;
+  let attemptedPriceId: string | undefined;
+
   try {
     const body = (await request.json()) as CheckoutRequestBody;
     const planId = normalizePlanId(typeof body.planId === "string" ? body.planId : undefined);
     const priceId = STRIPE_PRICE_IDS[planId];
+    attemptedPlanId = planId;
+    attemptedPriceId = priceId;
 
     if (!priceId) {
       return NextResponse.json({ error: "Missing Stripe Price ID configuration" }, { status: 500 });
@@ -88,7 +103,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error("Failed to create checkout session", error);
+    const stripeMessage = isStripeLikeError(error) && typeof error.message === "string" ? error.message : "";
+    const normalizedMessage = stripeMessage.toLowerCase();
+
+    console.error("Failed to create checkout session", {
+      planId: attemptedPlanId,
+      priceId: attemptedPriceId,
+      error,
+    });
+
+    if (normalizedMessage.includes("price specified is inactive")) {
+      return NextResponse.json(
+        {
+          error:
+            "This plan is temporarily unavailable because its Stripe price is inactive. Please contact support to refresh billing configuration.",
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
   }
 }
