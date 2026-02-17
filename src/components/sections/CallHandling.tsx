@@ -20,9 +20,12 @@ export function CallHandling() {
                 audioRef.current.pause();
                 audioRef.current.currentTime = 0;
 
-                // Update source and load - Tradies uses MP3, Gyms uses WAV
-                const extension = type === "Tradies" ? "mp3" : "wav";
-                audioRef.current.src = `/audio/${type.toLowerCase()}.${extension}`;
+                // Use explicit file mapping so each industry can point to its latest demo asset.
+                const audioFileByType: Record<string, string> = {
+                    Tradies: "tradies.mp3",
+                    Gyms: "gymdemoV1.mp3",
+                };
+                audioRef.current.src = `/audio/${audioFileByType[type] ?? "tradies.mp3"}`;
                 audioRef.current.load();
                 audioRef.current.volume = 1.0;
 
