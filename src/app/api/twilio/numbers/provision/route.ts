@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 import { getVoiceAgentForUser } from "@/lib/voiceAgents";
-import { provisionTwilioNumber } from "@/lib/twilioProvisioning";
+import { provisionTwilioNumber, TwilioApiError } from "@/lib/twilioProvisioning";
 import { upsertTwilioPhoneNumber } from "@/lib/twilioPhoneNumbers";
 
 interface ProvisionTwilioNumberBody {
@@ -67,6 +67,23 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to provision Twilio number", error);
+    if (error instanceof TwilioApiError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          twilioCode: error.code,
+          twilioMoreInfo: error.moreInfo,
+        },
+        {
+          status: error.status >= 400 && error.status < 600 ? error.status : 502,
+        }
+      );
+    }
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
     return NextResponse.json({ error: "Could not provision Twilio number right now." }, { status: 500 });
   }
 }
