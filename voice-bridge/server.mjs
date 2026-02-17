@@ -79,133 +79,173 @@ server.on("upgrade", (request, socket, head) => {
   });
 });
 
-wss.on("connection", async (twilioWs, request, requestUrl) => {
-  const agentId = requestUrl.searchParams.get("agentId");
-  if (!agentId) {
-    twilioWs.close(1008, "Missing agentId");
-    return;
+function extractAgentIdFromStart(startEvent, requestUrl) {
+  if (!startEvent || typeof startEvent !== "object") {
+    return requestUrl.searchParams.get("agentId");
   }
 
-  let agent;
-  try {
-    agent = await loadActiveAgent(agentId);
-  } catch (error) {
-    console.error("Failed loading agent for stream", { agentId, error });
-    twilioWs.close(1011, "Agent lookup failed");
-    return;
+  const customParameters = startEvent.customParameters;
+  if (!customParameters || typeof customParameters !== "object" || Array.isArray(customParameters)) {
+    return requestUrl.searchParams.get("agentId");
   }
 
-  if (!agent) {
-    twilioWs.close(1008, "Unknown agent");
-    return;
+  for (const [key, value] of Object.entries(customParameters)) {
+    if (typeof value !== "string" || !value.trim()) {
+      continue;
+    }
+
+    const normalizedKey = key.replace(/[_-]/g, "").toLowerCase();
+    if (normalizedKey === "agentid") {
+      return value.trim();
+    }
   }
 
-  console.log("Twilio media stream opened", {
-    agentId,
-    streamPath: requestUrl.pathname,
-    fromIp: request.socket.remoteAddress ?? "unknown",
-  });
+  return requestUrl.searchParams.get("agentId");
+}
 
-  const openAiWs = new WebSocket(`wss://api.openai.com/v1/realtime?model=${encodeURIComponent(OPENAI_REALTIME_MODEL)}`, {
-    headers: {
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-      "OpenAI-Beta": "realtime=v1",
-    },
-  });
-
+wss.on("connection", (twilioWs, request, requestUrl) => {
   let streamSid = "";
   let sessionReady = false;
   let openingPromptQueued = false;
+  let activeAgentId = requestUrl.searchParams.get("agentId");
+  let activeAgent = null;
+  let openAiWs = null;
+  let openAiConnecting = false;
 
   function closeBoth() {
     if (isOpen(twilioWs)) {
       twilioWs.close();
     }
-    if (isOpen(openAiWs)) {
+    if (openAiWs && isOpen(openAiWs)) {
       openAiWs.close();
     }
   }
 
-  openAiWs.on("open", () => {
-    sessionReady = true;
+  async function connectOpenAiForAgent(agentId) {
+    if (openAiWs || openAiConnecting) {
+      return;
+    }
 
-    openAiWs.send(
-      JSON.stringify({
-        type: "session.update",
-        session: {
-          turn_detection: { type: "server_vad" },
-          input_audio_format: "g711_ulaw",
-          output_audio_format: "g711_ulaw",
-          voice: OPENAI_REALTIME_VOICE,
-          modalities: ["text", "audio"],
-          temperature: 0.7,
-          instructions: agent.system_prompt,
+    openAiConnecting = true;
+
+    try {
+      const agent = await loadActiveAgent(agentId);
+      if (!agent) {
+        console.error("Agent not found or inactive", { agentId });
+        if (isOpen(twilioWs)) {
+          twilioWs.close(1008, "Unknown agent");
+        }
+        return;
+      }
+
+      activeAgent = agent;
+
+      if (!isOpen(twilioWs)) {
+        return;
+      }
+
+      console.log("Twilio media stream opened", {
+        agentId,
+        streamPath: requestUrl.pathname,
+        fromIp: request.socket.remoteAddress ?? "unknown",
+      });
+
+      openAiWs = new WebSocket(`wss://api.openai.com/v1/realtime?model=${encodeURIComponent(OPENAI_REALTIME_MODEL)}`, {
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "OpenAI-Beta": "realtime=v1",
         },
-      })
-    );
-  });
+      });
 
-  openAiWs.on("message", (message) => {
-    const event = safeJsonParse(message.toString());
-    if (!event || typeof event.type !== "string") {
-      return;
-    }
+      openAiWs.on("open", () => {
+        sessionReady = true;
 
-    if (event.type === "session.updated" && !openingPromptQueued) {
-      openingPromptQueued = true;
+        openAiWs.send(
+          JSON.stringify({
+            type: "session.update",
+            session: {
+              turn_detection: { type: "server_vad" },
+              input_audio_format: "g711_ulaw",
+              output_audio_format: "g711_ulaw",
+              voice: OPENAI_REALTIME_VOICE,
+              modalities: ["text", "audio"],
+              temperature: 0.7,
+              instructions: activeAgent.system_prompt,
+            },
+          })
+        );
+      });
 
-      openAiWs.send(
-        JSON.stringify({
-          type: "conversation.item.create",
-          item: {
-            type: "message",
-            role: "user",
-            content: [
-              {
-                type: "input_text",
-                text: `Start the call with this exact opening script, then continue naturally: ${agent.opening_script}`,
+      openAiWs.on("message", (message) => {
+        const event = safeJsonParse(message.toString());
+        if (!event || typeof event.type !== "string") {
+          return;
+        }
+
+        if (event.type === "session.updated" && !openingPromptQueued && activeAgent) {
+          openingPromptQueued = true;
+
+          openAiWs.send(
+            JSON.stringify({
+              type: "conversation.item.create",
+              item: {
+                type: "message",
+                role: "user",
+                content: [
+                  {
+                    type: "input_text",
+                    text: `Start the call with this exact opening script, then continue naturally: ${activeAgent.opening_script}`,
+                  },
+                ],
               },
-            ],
-          },
-        })
-      );
+            })
+          );
 
-      openAiWs.send(
-        JSON.stringify({
-          type: "response.create",
-        })
-      );
-      return;
+          openAiWs.send(
+            JSON.stringify({
+              type: "response.create",
+            })
+          );
+          return;
+        }
+
+        if (event.type === "response.audio.delta" && event.delta && streamSid && isOpen(twilioWs)) {
+          twilioWs.send(
+            JSON.stringify({
+              event: "media",
+              streamSid,
+              media: {
+                payload: event.delta,
+              },
+            })
+          );
+          return;
+        }
+
+        if (event.type === "error") {
+          console.error("OpenAI realtime stream error event", event);
+        }
+      });
+
+      openAiWs.on("close", () => {
+        if (isOpen(twilioWs)) {
+          twilioWs.close();
+        }
+      });
+
+      openAiWs.on("error", (error) => {
+        console.error("OpenAI realtime websocket error", error);
+        closeBoth();
+      });
+    } catch (error) {
+      console.error("Failed loading agent for stream", { agentId, error });
+      if (isOpen(twilioWs)) {
+        twilioWs.close(1011, "Agent lookup failed");
+      }
+    } finally {
+      openAiConnecting = false;
     }
-
-    if (event.type === "response.audio.delta" && event.delta && streamSid && isOpen(twilioWs)) {
-      twilioWs.send(
-        JSON.stringify({
-          event: "media",
-          streamSid,
-          media: {
-            payload: event.delta,
-          },
-        })
-      );
-      return;
-    }
-
-    if (event.type === "error") {
-      console.error("OpenAI realtime stream error event", event);
-    }
-  });
-
-  openAiWs.on("close", () => {
-    if (isOpen(twilioWs)) {
-      twilioWs.close();
-    }
-  });
-
-  openAiWs.on("error", (error) => {
-    console.error("OpenAI realtime websocket error", error);
-    closeBoth();
-  });
+  }
 
   twilioWs.on("message", (message) => {
     const data = safeJsonParse(message.toString());
@@ -215,6 +255,16 @@ wss.on("connection", async (twilioWs, request, requestUrl) => {
 
     if (data.event === "start") {
       streamSid = data.start?.streamSid ?? "";
+
+      const extractedAgentId = extractAgentIdFromStart(data.start, requestUrl);
+      if (!extractedAgentId) {
+        console.error("Missing agentId in Twilio stream start payload");
+        closeBoth();
+        return;
+      }
+
+      activeAgentId = extractedAgentId;
+      void connectOpenAiForAgent(activeAgentId);
       return;
     }
 
@@ -224,7 +274,7 @@ wss.on("connection", async (twilioWs, request, requestUrl) => {
         return;
       }
 
-      if (!sessionReady || !isOpen(openAiWs)) {
+      if (!sessionReady || !openAiWs || !isOpen(openAiWs)) {
         return;
       }
 
@@ -243,7 +293,7 @@ wss.on("connection", async (twilioWs, request, requestUrl) => {
   });
 
   twilioWs.on("close", () => {
-    if (isOpen(openAiWs)) {
+    if (openAiWs && isOpen(openAiWs)) {
       openAiWs.close();
     }
   });

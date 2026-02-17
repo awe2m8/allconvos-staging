@@ -28,16 +28,14 @@ function buildErrorTwiml(message: string): string {
 </Response>`;
 }
 
-function buildBridgeStreamUrl(agentId: string): string | null {
+function buildBridgeStreamUrl(): string | null {
   const rawBridgeUrl = process.env.VOICE_BRIDGE_WS_URL;
   if (!rawBridgeUrl) {
     return null;
   }
 
   try {
-    const bridgeUrl = new URL(rawBridgeUrl);
-    bridgeUrl.searchParams.set("agentId", agentId);
-    return bridgeUrl.toString();
+    return new URL(rawBridgeUrl).toString();
   } catch {
     return null;
   }
@@ -49,7 +47,7 @@ async function handleIncomingCall(request: NextRequest): Promise<NextResponse> {
     return twimlResponse(buildErrorTwiml("This number is not configured with an active receptionist."), 400);
   }
 
-  const streamUrl = buildBridgeStreamUrl(agentId);
+  const streamUrl = buildBridgeStreamUrl();
   if (!streamUrl) {
     return twimlResponse(buildErrorTwiml("Voice bridge is not configured yet. Please try again later."), 500);
   }
@@ -64,7 +62,9 @@ async function handleIncomingCall(request: NextRequest): Promise<NextResponse> {
 <Response>
   <Say>Connecting you now.</Say>
   <Connect>
-    <Stream url="${escapeXml(streamUrl)}" />
+    <Stream url="${escapeXml(streamUrl)}">
+      <Parameter name="agentId" value="${escapeXml(agentId)}" />
+    </Stream>
   </Connect>
 </Response>`;
 
