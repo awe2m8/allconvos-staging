@@ -899,8 +899,10 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                   <div className="grid gap-3 md:grid-cols-[120px_1fr_auto]">
                     <input
                       value={twilioCountryCode}
-                      onChange={(event) => setTwilioCountryCode(event.target.value.toUpperCase().slice(0, 2))}
-                      placeholder="US"
+                      onChange={(event) =>
+                        setTwilioCountryCode(event.target.value.toUpperCase().replaceAll(/[^A-Z0-9+]/g, "").slice(0, 4))
+                      }
+                      placeholder="US or +61"
                       className="h-11 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
                     />
                     <input

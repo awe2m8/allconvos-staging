@@ -65,7 +65,26 @@ async function twilioRequest(path: string, init?: RequestInit): Promise<Response
 }
 
 function normalizeCountryCode(countryCode: string): string {
-  return countryCode.trim().toUpperCase().slice(0, 2);
+  const raw = countryCode.trim().toUpperCase();
+
+  if (/^[A-Z]{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const digits = raw.replace(/^\+/, "").replaceAll(/\D/g, "");
+  const callingCodeMap: Record<string, string> = {
+    "1": "US",
+    "44": "GB",
+    "61": "AU",
+    "64": "NZ",
+  };
+
+  const mapped = callingCodeMap[digits];
+  if (mapped) {
+    return mapped;
+  }
+
+  throw new Error("Invalid country code. Use ISO code like AU or calling code like +61.");
 }
 
 function normalizeAreaCode(areaCode: string | null | undefined): string | null {
