@@ -42,6 +42,14 @@ interface TwilioIncomingPhoneNumbersListResponse {
   incoming_phone_numbers?: TwilioIncomingPhoneNumberResponse[];
 }
 
+interface TwilioAddressResponse {
+  sid?: string;
+}
+
+interface TwilioAddressesListResponse {
+  addresses?: TwilioAddressResponse[];
+}
+
 export class TwilioApiError extends Error {
   status: number;
   code: number | null;
@@ -110,6 +118,43 @@ async function readTwilioError(response: Response, fallbackMessage: string): Pro
     code,
     moreInfo,
   });
+}
+
+let cachedAddressSid: string | null | undefined;
+
+function getConfiguredTwilioAddressSid(): string | null {
+  const raw = process.env.TWILIO_ADDRESS_SID;
+  if (!raw) {
+    return null;
+  }
+
+  const sid = raw.trim();
+  if (!sid) {
+    return null;
+  }
+
+  return sid;
+}
+
+async function findAnyTwilioAddressSid(): Promise<string | null> {
+  if (cachedAddressSid !== undefined) {
+    return cachedAddressSid;
+  }
+
+  const response = await twilioRequest("/Addresses.json?PageSize=20");
+  if (!response.ok) {
+    cachedAddressSid = null;
+    return cachedAddressSid;
+  }
+
+  const payload = (await response.json()) as TwilioAddressesListResponse;
+  const addressSid =
+    payload.addresses
+      ?.map((address) => (typeof address.sid === "string" ? address.sid.trim() : ""))
+      .find((sid) => sid.length > 0) ?? null;
+
+  cachedAddressSid = addressSid;
+  return cachedAddressSid;
 }
 
 async function twilioRequest(path: string, init?: RequestInit): Promise<Response> {
@@ -316,6 +361,37 @@ async function updateIncomingPhoneNumberVoiceWebhook(input: { sid: string; voice
   return (await response.json()) as TwilioIncomingPhoneNumberResponse;
 }
 
+async function createIncomingPhoneNumber(input: {
+  phoneNumber: string;
+  voiceUrl: string;
+  addressSid?: string | null;
+}): Promise<TwilioIncomingPhoneNumberResponse> {
+  const body = new URLSearchParams({
+    PhoneNumber: input.phoneNumber,
+    VoiceUrl: input.voiceUrl,
+    VoiceMethod: "POST",
+  });
+
+  const addressSid = input.addressSid?.trim();
+  if (addressSid) {
+    body.set("AddressSid", addressSid);
+  }
+
+  const response = await twilioRequest("/IncomingPhoneNumbers.json", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    throw await readTwilioError(response, "Could not buy and attach this number");
+  }
+
+  return (await response.json()) as TwilioIncomingPhoneNumberResponse;
+}
+
 export async function provisionTwilioNumber(input: {
   phoneNumber: string;
   agentId: string;
@@ -339,27 +415,37 @@ export async function provisionTwilioNumber(input: {
     });
   }
 
-  const body = new URLSearchParams({
-    PhoneNumber: normalizedPhoneNumber,
-    VoiceUrl: voiceUrl,
-    VoiceMethod: "POST",
-  });
+  const configuredAddressSid = getConfiguredTwilioAddressSid();
+  try {
+    const payload = await createIncomingPhoneNumber({
+      phoneNumber: normalizedPhoneNumber,
+      voiceUrl,
+      addressSid: configuredAddressSid,
+    });
+    return mapIncomingNumber(payload, {
+      phoneNumber: normalizedPhoneNumber,
+      voiceUrl,
+    });
+  } catch (error) {
+    if (!(error instanceof TwilioApiError) || error.code !== 21631 || configuredAddressSid) {
+      throw error;
+    }
 
-  const response = await twilioRequest("/IncomingPhoneNumbers.json", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: body.toString(),
-  });
+    const fallbackAddressSid = await findAnyTwilioAddressSid();
+    if (!fallbackAddressSid) {
+      throw new Error(
+        "Twilio requires an approved Address for this number. Add one in Twilio, then set TWILIO_ADDRESS_SID in Vercel and retry."
+      );
+    }
 
-  if (!response.ok) {
-    throw await readTwilioError(response, "Could not buy and attach this number");
+    const payload = await createIncomingPhoneNumber({
+      phoneNumber: normalizedPhoneNumber,
+      voiceUrl,
+      addressSid: fallbackAddressSid,
+    });
+    return mapIncomingNumber(payload, {
+      phoneNumber: normalizedPhoneNumber,
+      voiceUrl,
+    });
   }
-
-  const payload = (await response.json()) as TwilioIncomingPhoneNumberResponse;
-  return mapIncomingNumber(payload, {
-    phoneNumber: normalizedPhoneNumber,
-    voiceUrl,
-  });
 }

@@ -45,6 +45,8 @@ VOICE_BRIDGE_WS_URL=
 # Twilio number provisioning
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
+# Optional but recommended for countries requiring address compliance (e.g. AU)
+TWILIO_ADDRESS_SID=
 ```
 
 ## Supabase schema
