@@ -103,24 +103,28 @@ alter table public.onboarding_progress enable row level security;
 alter table public.voice_agents enable row level security;
 alter table public.twilio_phone_numbers enable row level security;
 
+drop policy if exists "Service role full access subscriptions" on public.subscriptions;
 create policy "Service role full access subscriptions"
 on public.subscriptions
 for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');
 
+drop policy if exists "Service role full access onboarding_progress" on public.onboarding_progress;
 create policy "Service role full access onboarding_progress"
 on public.onboarding_progress
 for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');
 
+drop policy if exists "Service role full access voice_agents" on public.voice_agents;
 create policy "Service role full access voice_agents"
 on public.voice_agents
 for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');
 
+drop policy if exists "Service role full access twilio_phone_numbers" on public.twilio_phone_numbers;
 create policy "Service role full access twilio_phone_numbers"
 on public.twilio_phone_numbers
 for all
