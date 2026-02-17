@@ -121,6 +121,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [twilioSearchResults, setTwilioSearchResults] = useState<TwilioSearchNumber[]>([]);
   const [provisionedTwilioNumbers, setProvisionedTwilioNumbers] = useState<TwilioProvisionedNumber[]>([]);
   const [provisioningNumber, setProvisioningNumber] = useState<string | null>(null);
+  const [provisionSuccessMessage, setProvisionSuccessMessage] = useState<string | null>(null);
 
   const combinedTranscript = useMemo(() => {
     return `${transcript}${interimTranscript ? ` ${interimTranscript}` : ""}`.trim();
@@ -137,6 +138,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     if (!createdLiveAgent?.agentId) {
       setTwilioSearchResults([]);
       setProvisionedTwilioNumbers([]);
+      setProvisionSuccessMessage(null);
       return;
     }
 
@@ -531,6 +533,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     }
 
     setError(null);
+    setProvisionSuccessMessage(null);
     setIsSearchingTwilioNumbers(true);
     setTwilioSearchResults([]);
 
@@ -567,6 +570,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     }
 
     setError(null);
+    setProvisionSuccessMessage(null);
     setProvisioningNumber(phoneNumber);
 
     try {
@@ -587,7 +591,9 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
       }
 
       await loadProvisionedTwilioNumbers(createdLiveAgent.agentId);
+      setProvisionSuccessMessage(`Success: ${data.number.phoneNumber} is active and attached to this agent.`);
     } catch (provisionError: unknown) {
+      setProvisionSuccessMessage(null);
       setError(provisionError instanceof Error ? provisionError.message : "Could not provision number");
     } finally {
       setProvisioningNumber(null);
@@ -660,6 +666,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 setDraft(null);
                 setCreatedLiveAgent(null);
                 setCopiedField(null);
+                setProvisionSuccessMessage(null);
                 setError(null);
               }}
               className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-xs font-mono uppercase tracking-widest text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
@@ -845,35 +852,66 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 <div className="rounded-xl border border-white/10 bg-ocean-950/60 p-4 space-y-4">
                   <p className="text-[11px] font-mono uppercase tracking-wider text-gray-300">Twilio Number Provisioning</p>
 
-                  <div className="grid gap-3 md:grid-cols-[120px_minmax(0,1fr)_164px]">
-                    <input
-                      value={twilioCountryCode}
-                      onChange={(event) =>
-                        setTwilioCountryCode(event.target.value.toUpperCase().replaceAll(/[^A-Z0-9+]/g, "").slice(0, 4))
-                      }
-                      placeholder="US or +61"
-                      className="h-11 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
-                    />
-                    <input
-                      value={twilioAreaCode}
-                      onChange={(event) => setTwilioAreaCode(event.target.value.replaceAll(/\D/g, "").slice(0, 6))}
-                      placeholder="Area code (optional)"
-                      className="h-11 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
-                    />
-                    <button
-                      type="button"
-                      onClick={searchTwilioNumbers}
-                      disabled={isSearchingTwilioNumbers}
-                      className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-neon/40 px-4 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 disabled:opacity-60"
-                    >
-                      {isSearchingTwilioNumbers ? "Searching" : "Find Numbers"}
-                    </button>
+                  {provisionSuccessMessage && (
+                    <p className="rounded-lg border border-neon/40 bg-neon/10 px-3 py-2 text-xs text-neon">{provisionSuccessMessage}</p>
+                  )}
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-300">Active numbers</p>
+                    {isLoadingProvisionedNumbers ? (
+                      <p className="text-xs text-gray-400">Loading assigned numbers...</p>
+                    ) : provisionedTwilioNumbers.length === 0 ? (
+                      <p className="text-xs text-gray-400">No numbers assigned yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {provisionedTwilioNumbers.map((number) => (
+                          <div
+                            key={number.sid}
+                            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/20 p-3"
+                          >
+                            <div className="space-y-1">
+                              <p className="text-sm text-white font-medium">{number.phoneNumber}</p>
+                              <p className="text-xs text-gray-400">{number.friendlyName ?? "Twilio number"}</p>
+                            </div>
+                            <span className="rounded-md border border-neon/40 bg-neon/15 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neon">
+                              {number.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  {twilioSearchResults.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-xs text-gray-300">Available numbers</p>
+                  <div className="space-y-3">
+                    <p className="text-xs text-gray-300">Find new numbers</p>
+                    <div className="grid gap-3 md:grid-cols-[120px_minmax(0,1fr)_164px]">
+                      <input
+                        value={twilioCountryCode}
+                        onChange={(event) =>
+                          setTwilioCountryCode(event.target.value.toUpperCase().replaceAll(/[^A-Z0-9+]/g, "").slice(0, 4))
+                        }
+                        placeholder="US or +61"
+                        className="h-11 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
+                      />
+                      <input
+                        value={twilioAreaCode}
+                        onChange={(event) => setTwilioAreaCode(event.target.value.replaceAll(/\D/g, "").slice(0, 6))}
+                        placeholder="Area code (optional)"
+                        className="h-11 rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
+                      />
+                      <button
+                        type="button"
+                        onClick={searchTwilioNumbers}
+                        disabled={isSearchingTwilioNumbers}
+                        className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-neon/40 px-4 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 disabled:opacity-60"
+                      >
+                        {isSearchingTwilioNumbers ? "Searching" : "Find Numbers"}
+                      </button>
+                    </div>
+
+                    {twilioSearchResults.length > 0 && (
                       <div className="space-y-2">
+                        <p className="text-xs text-gray-300">Available numbers</p>
                         {twilioSearchResults.map((number) => (
                           <div
                             key={number.phoneNumber}
@@ -893,32 +931,6 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                             >
                               {provisioningNumber === number.phoneNumber ? "Provisioning" : "Buy & Attach"}
                             </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-300">Assigned numbers</p>
-                    {isLoadingProvisionedNumbers ? (
-                      <p className="text-xs text-gray-400">Loading assigned numbers...</p>
-                    ) : provisionedTwilioNumbers.length === 0 ? (
-                      <p className="text-xs text-gray-400">No numbers assigned yet.</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {provisionedTwilioNumbers.map((number) => (
-                          <div
-                            key={number.sid}
-                            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/10 bg-black/20 p-3"
-                          >
-                            <div className="space-y-1">
-                              <p className="text-sm text-white font-medium">{number.phoneNumber}</p>
-                              <p className="text-xs text-gray-400">{number.friendlyName ?? "Twilio number"}</p>
-                            </div>
-                            <span className="rounded-md border border-neon/40 bg-neon/15 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neon">
-                              {number.status}
-                            </span>
                           </div>
                         ))}
                       </div>
