@@ -171,26 +171,37 @@ export async function searchAvailableTwilioNumbers(input: {
     throw new Error("Invalid country code");
   }
 
-  const params = new URLSearchParams({
+  const baseParams = {
     PageSize: String(Math.min(Math.max(input.limit ?? 8, 1), 20)),
     VoiceEnabled: "true",
     SmsEnabled: "true",
-  });
+  };
 
   const isAustralia = countryCode === "AU";
   const normalizedAreaCode = normalizeAreaCode(input.areaCode);
-  if (normalizedAreaCode && !isAustralia) {
-    params.set("AreaCode", normalizedAreaCode);
-  }
-  if (isAustralia) {
-    // AU inventory often contains numbers with regulatory address requirements.
-    // Excluding those here avoids "search succeeds, purchase fails" UX.
-    params.set("ExcludeAllAddressRequired", "true");
+  function buildSearchParams(options?: { excludeAddressRequired?: boolean }): URLSearchParams {
+    const params = new URLSearchParams(baseParams);
+    if (normalizedAreaCode && !isAustralia) {
+      params.set("AreaCode", normalizedAreaCode);
+    }
+    if (isAustralia && options?.excludeAddressRequired) {
+      // AU inventory often contains numbers with regulatory address requirements.
+      // We try this filter first, then fall back to broader AU inventory.
+      params.set("ExcludeAllAddressRequired", "true");
+    }
+    return params;
   }
 
-  async function fetchByResource(resource: "Local" | "Mobile"): Promise<TwilioAvailableNumber[]> {
+  async function fetchByResource(
+    resource: "Local" | "Mobile",
+    options?: { excludeAddressRequired?: boolean; softFail?: boolean }
+  ): Promise<TwilioAvailableNumber[]> {
+    const params = buildSearchParams(options);
     const response = await twilioRequest(`/AvailablePhoneNumbers/${countryCode}/${resource}.json?${params.toString()}`);
     if (!response.ok) {
+      if (options?.softFail) {
+        return [];
+      }
       throw await readTwilioError(response, `Could not search ${resource.toLowerCase()} numbers`);
     }
 
@@ -217,10 +228,27 @@ export async function searchAvailableTwilioNumbers(input: {
 
   // AU should prioritize mobile inventory so users don't receive landline-heavy results.
   if (isAustralia) {
-    const mobileNumbers = await fetchByResource("Mobile");
+    const mobileNumbers = await fetchByResource("Mobile", {
+      excludeAddressRequired: true,
+      softFail: true,
+    });
     if (mobileNumbers.length > 0) {
       return mobileNumbers;
     }
+
+    const fallbackMobile = await fetchByResource("Mobile");
+    if (fallbackMobile.length > 0) {
+      return fallbackMobile;
+    }
+
+    const localNumbers = await fetchByResource("Local", {
+      excludeAddressRequired: true,
+      softFail: true,
+    });
+    if (localNumbers.length > 0) {
+      return localNumbers;
+    }
+
     return fetchByResource("Local");
   }
 
