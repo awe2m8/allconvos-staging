@@ -136,6 +136,20 @@ function getConfiguredTwilioAddressSid(): string | null {
   return sid;
 }
 
+function getConfiguredTwilioBundleSid(): string | null {
+  const raw = process.env.TWILIO_BUNDLE_SID;
+  if (!raw) {
+    return null;
+  }
+
+  const sid = raw.trim();
+  if (!sid) {
+    return null;
+  }
+
+  return sid;
+}
+
 async function findAnyTwilioAddressSid(): Promise<string | null> {
   if (cachedAddressSid !== undefined) {
     return cachedAddressSid;
@@ -365,6 +379,7 @@ async function createIncomingPhoneNumber(input: {
   phoneNumber: string;
   voiceUrl: string;
   addressSid?: string | null;
+  bundleSid?: string | null;
 }): Promise<TwilioIncomingPhoneNumberResponse> {
   const body = new URLSearchParams({
     PhoneNumber: input.phoneNumber,
@@ -375,6 +390,10 @@ async function createIncomingPhoneNumber(input: {
   const addressSid = input.addressSid?.trim();
   if (addressSid) {
     body.set("AddressSid", addressSid);
+  }
+  const bundleSid = input.bundleSid?.trim();
+  if (bundleSid) {
+    body.set("BundleSid", bundleSid);
   }
 
   const response = await twilioRequest("/IncomingPhoneNumbers.json", {
@@ -416,16 +435,32 @@ export async function provisionTwilioNumber(input: {
   }
 
   const configuredAddressSid = getConfiguredTwilioAddressSid();
+  const configuredBundleSid = getConfiguredTwilioBundleSid();
+
+  async function attemptPurchase(addressSid: string | null): Promise<TwilioProvisionedNumber> {
+    try {
+      const payload = await createIncomingPhoneNumber({
+        phoneNumber: normalizedPhoneNumber,
+        voiceUrl,
+        addressSid,
+        bundleSid: configuredBundleSid,
+      });
+      return mapIncomingNumber(payload, {
+        phoneNumber: normalizedPhoneNumber,
+        voiceUrl,
+      });
+    } catch (error) {
+      if (error instanceof TwilioApiError && error.code === 21649 && !configuredBundleSid) {
+        throw new Error(
+          "Twilio requires a Regulatory Bundle for AU mobile numbers. Set TWILIO_BUNDLE_SID in Vercel and retry."
+        );
+      }
+      throw error;
+    }
+  }
+
   try {
-    const payload = await createIncomingPhoneNumber({
-      phoneNumber: normalizedPhoneNumber,
-      voiceUrl,
-      addressSid: configuredAddressSid,
-    });
-    return mapIncomingNumber(payload, {
-      phoneNumber: normalizedPhoneNumber,
-      voiceUrl,
-    });
+    return await attemptPurchase(configuredAddressSid);
   } catch (error) {
     if (!(error instanceof TwilioApiError) || error.code !== 21631 || configuredAddressSid) {
       throw error;
@@ -438,14 +473,6 @@ export async function provisionTwilioNumber(input: {
       );
     }
 
-    const payload = await createIncomingPhoneNumber({
-      phoneNumber: normalizedPhoneNumber,
-      voiceUrl,
-      addressSid: fallbackAddressSid,
-    });
-    return mapIncomingNumber(payload, {
-      phoneNumber: normalizedPhoneNumber,
-      voiceUrl,
-    });
+    return attemptPurchase(fallbackAddressSid);
   }
 }

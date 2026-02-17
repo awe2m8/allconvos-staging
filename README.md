@@ -47,6 +47,8 @@ TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 # Optional but recommended for countries requiring address compliance (e.g. AU)
 TWILIO_ADDRESS_SID=
+# Optional: required for some regions/number types (e.g. AU mobile)
+TWILIO_BUNDLE_SID=
 ```
 
 ## Supabase schema
