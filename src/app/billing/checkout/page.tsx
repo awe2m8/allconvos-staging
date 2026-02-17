@@ -80,7 +80,7 @@ export default async function BillingCheckoutPage({ searchParams }: BillingCheck
                 href={marketingUrl("/contact")}
                 className="w-full inline-flex items-center justify-center rounded-xl px-5 py-4 font-mono uppercase tracking-widest text-xs border border-white/15 text-white hover:bg-white/10 transition-colors"
               >
-                Request Intel
+                Explore this Solution
               </Link>
             </section>
           </div>

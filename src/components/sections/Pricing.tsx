@@ -97,7 +97,7 @@ export function Pricing() {
                                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                {plan.price === 'CUSTOM' ? 'Request Intel' : 'Start Receptionist Setup'}
+                                {plan.price === 'CUSTOM' ? 'Explore this Solution' : 'Start Receptionist Setup'}
                             </Link>
 
                             {/* Decorative background badge */}
