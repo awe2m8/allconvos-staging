@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Loader2, Mic, PhoneCall, PhoneOff, Square, Volume2, Wand2 } from "lucide-react";
+import { Check, Copy, Loader2, Mic, PhoneCall, PhoneOff, Square, Wand2 } from "lucide-react";
 
 interface PromptDraft {
   businessSummary: string;
@@ -104,7 +104,6 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [interimTranscript, setInterimTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [isCreatingLiveAgent, setIsCreatingLiveAgent] = useState(false);
   const [isStartingWebCall, setIsStartingWebCall] = useState(false);
   const [isWebCallActive, setIsWebCallActive] = useState(false);
@@ -115,7 +114,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [webCallStatus, setWebCallStatus] = useState<string | null>(null);
   const [webCallEvents, setWebCallEvents] = useState<string[]>([]);
-  const [twilioCountryCode, setTwilioCountryCode] = useState("US");
+  const [twilioCountryCode, setTwilioCountryCode] = useState("+61");
   const [twilioAreaCode, setTwilioAreaCode] = useState("");
   const [isSearchingTwilioNumbers, setIsSearchingTwilioNumbers] = useState(false);
   const [isLoadingProvisionedNumbers, setIsLoadingProvisionedNumbers] = useState(false);
@@ -130,9 +129,6 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   useEffect(() => {
     return () => {
       recognitionRef.current?.stop();
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
       stopWebCall();
     };
   }, []);
@@ -298,32 +294,6 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     } finally {
       setIsGenerating(false);
     }
-  }
-
-  function playVoicePreview() {
-    if (!draft?.openingScript) {
-      return;
-    }
-
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-      setError("Voice preview is not supported in this browser.");
-      return;
-    }
-
-    setError(null);
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(draft.openingScript);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      setError("Voice preview failed.");
-    };
-
-    window.speechSynthesis.speak(utterance);
   }
 
   async function createLiveAgent() {
@@ -724,7 +694,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8 space-y-6">
             <h2 className="text-2xl font-bold text-white">Generated Agent Draft</h2>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="space-y-4">
               <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
                 <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Tasks</p>
                 <ul className="space-y-2 text-sm text-gray-200">
@@ -765,18 +735,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
           </div>
 
           <div className="rounded-3xl border border-neon/30 bg-neon/5 p-5 md:p-6 space-y-4 lg:sticky lg:top-6">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-neon">Go Live with Twilio</p>
-              <button
-                type="button"
-                onClick={playVoicePreview}
-                disabled={isSpeaking}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neon/40 px-3 py-2 text-[11px] font-mono uppercase tracking-widest text-neon hover:bg-neon/10 transition-colors disabled:opacity-60"
-              >
-                <Volume2 className="h-3.5 w-3.5" />
-                {isSpeaking ? "Playing..." : "Voice Preview"}
-              </button>
-            </div>
+            <p className="text-[11px] font-mono uppercase tracking-wider text-neon">Go Live with Twilio</p>
 
             <div className="grid gap-3 md:grid-cols-[1fr_auto]">
               <input

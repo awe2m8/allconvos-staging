@@ -116,36 +116,50 @@ export async function searchAvailableTwilioNumbers(input: {
     SmsEnabled: "true",
   });
 
+  const isAustralia = countryCode === "AU";
   const normalizedAreaCode = normalizeAreaCode(input.areaCode);
-  if (normalizedAreaCode) {
+  if (normalizedAreaCode && !isAustralia) {
     params.set("AreaCode", normalizedAreaCode);
   }
 
-  const response = await twilioRequest(`/AvailablePhoneNumbers/${countryCode}/Local.json?${params.toString()}`);
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Twilio number search failed (${response.status}): ${errorText}`);
+  async function fetchByResource(resource: "Local" | "Mobile"): Promise<TwilioAvailableNumber[]> {
+    const response = await twilioRequest(`/AvailablePhoneNumbers/${countryCode}/${resource}.json?${params.toString()}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Twilio number search failed (${response.status}): ${errorText}`);
+    }
+
+    const payload = (await response.json()) as TwilioSearchResponse;
+    const numbers = payload.available_phone_numbers ?? [];
+
+    return numbers
+      .map((number) => {
+        const phoneNumber = typeof number.phone_number === "string" ? number.phone_number.trim() : "";
+        if (!phoneNumber) {
+          return null;
+        }
+
+        return {
+          phoneNumber,
+          friendlyName: typeof number.friendly_name === "string" ? number.friendly_name : phoneNumber,
+          locality: typeof number.locality === "string" ? number.locality : null,
+          region: typeof number.region === "string" ? number.region : null,
+          isoCountry: typeof number.iso_country === "string" ? number.iso_country : null,
+        } satisfies TwilioAvailableNumber;
+      })
+      .filter((number): number is TwilioAvailableNumber => number !== null);
   }
 
-  const payload = (await response.json()) as TwilioSearchResponse;
-  const numbers = payload.available_phone_numbers ?? [];
+  // AU should prioritize mobile inventory so users don't receive landline-heavy results.
+  if (isAustralia) {
+    const mobileNumbers = await fetchByResource("Mobile");
+    if (mobileNumbers.length > 0) {
+      return mobileNumbers;
+    }
+    return fetchByResource("Local");
+  }
 
-  return numbers
-    .map((number) => {
-      const phoneNumber = typeof number.phone_number === "string" ? number.phone_number.trim() : "";
-      if (!phoneNumber) {
-        return null;
-      }
-
-      return {
-        phoneNumber,
-        friendlyName: typeof number.friendly_name === "string" ? number.friendly_name : phoneNumber,
-        locality: typeof number.locality === "string" ? number.locality : null,
-        region: typeof number.region === "string" ? number.region : null,
-        isoCountry: typeof number.iso_country === "string" ? number.iso_country : null,
-      } satisfies TwilioAvailableNumber;
-    })
-    .filter((number): number is TwilioAvailableNumber => number !== null);
+  return fetchByResource("Local");
 }
 
 function normalizePhoneNumber(phoneNumber: string): string {
