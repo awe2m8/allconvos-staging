@@ -637,29 +637,29 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
         </div>
 
         <div className="flex justify-center mt-8">
-          <button
-            type="button"
-            onClick={isListening ? stopListening : startListening}
-            className={`h-52 w-52 rounded-full border font-mono text-sm uppercase tracking-[0.16em] transition-all ${
+          <div
+            role="status"
+            aria-live="polite"
+            className={`flex h-52 w-52 items-center justify-center rounded-full border font-mono text-sm uppercase tracking-[0.16em] transition-all ${
               isListening
                 ? "border-neon bg-neon text-ocean-950 shadow-[0_0_80px_rgba(16,248,194,0.3)] animate-pulse"
-                : "border-neon/50 bg-neon/10 text-neon hover:bg-neon/20 shadow-[0_0_80px_rgba(16,248,194,0.2)]"
+                : "border-neon/50 bg-neon/10 text-neon shadow-[0_0_80px_rgba(16,248,194,0.2)]"
             }`}
           >
-            {isListening ? "Listening..." : "Create your agent"}
-          </button>
+            {isListening ? "Listening..." : "Ready to record"}
+          </div>
         </div>
 
         <div className="mt-8 grid lg:grid-cols-[1fr_auto] gap-4">
           <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-3">Conversation Notes</p>
-            <textarea
-              readOnly
-              value={combinedTranscript}
-              placeholder="Tap ‘Create your agent’ and speak naturally about your business, common caller requests, tone of voice, and non-negotiable rules."
-              className="w-full min-h-[180px] resize-y rounded-xl border border-white/10 bg-ocean-950/60 px-3 py-3 text-sm text-gray-200 outline-none"
-            />
-          </div>
+              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-3">Conversation Notes</p>
+              <textarea
+                readOnly
+                value={combinedTranscript}
+                placeholder="Tap ‘Record’ and speak naturally about your business, common caller requests, tone of voice, and non-negotiable rules."
+                className="w-full min-h-[180px] resize-y rounded-xl border border-white/10 bg-ocean-950/60 px-3 py-3 text-sm text-gray-200 outline-none"
+              />
+            </div>
 
           <div className="flex lg:flex-col items-stretch gap-3">
             <button
