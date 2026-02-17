@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignOutButton, SignedIn, useUser } from "@clerk/nextjs";
-import { Box, LogOut, UserCircle2 } from "lucide-react";
+import { LogOut, UserCircle2 } from "lucide-react";
 import { appUrl } from "@/lib/siteUrls";
 
 export function AuthSessionIndicator() {
@@ -15,14 +14,13 @@ export function AuthSessionIndicator() {
   }
 
   const loginUrl = appUrl("/login");
-  const appHomeUrl = appUrl("/app/onboarding");
   const userLabel = user?.primaryEmailAddress?.emailAddress ?? user?.fullName ?? "Account";
 
   return (
     <div className="fixed bottom-4 left-4 z-[60]">
       <SignedIn>
         <div className="min-w-[260px] rounded-2xl border border-[#24406a] bg-[#08152a]/95 p-4 shadow-xl backdrop-blur-md">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start gap-2">
             <div className="inline-flex items-center rounded-md border border-neon/40 bg-neon/15 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-neon">
               FRONT DESK CORE
             </div>
@@ -34,13 +32,6 @@ export function AuthSessionIndicator() {
               <UserCircle2 className="h-4 w-4 shrink-0" />
               <p className="truncate text-sm font-medium">{userLabel}</p>
             </div>
-            <Link
-              href={appHomeUrl}
-              className="flex items-center gap-2 text-[#a8b7cd] hover:text-white transition-colors"
-            >
-              <Box className="h-4 w-4 shrink-0" />
-              <span className="text-sm font-medium">Open App</span>
-            </Link>
             <SignOutButton redirectUrl={loginUrl}>
               <button
                 type="button"
