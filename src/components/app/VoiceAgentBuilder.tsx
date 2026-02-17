@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Loader2, Mic, Square, Volume2, Wand2 } from "lucide-react";
+import { Check, Copy, Loader2, Mic, PhoneCall, PhoneOff, Square, Volume2, Wand2 } from "lucide-react";
 
 interface PromptDraft {
   businessSummary: string;
@@ -26,6 +26,13 @@ interface LiveAgentConfig {
 
 interface CreateLiveAgentResponse {
   agent?: LiveAgentConfig;
+  error?: string;
+}
+
+interface RealtimeClientSecretResponse {
+  clientSecret?: string;
+  model?: string;
+  openingScript?: string;
   error?: string;
 }
 
@@ -57,6 +64,10 @@ function getSpeechRecognitionCtor(): SpeechRecognitionCtor | null {
 
 export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const dataChannelRef = useRef<RTCDataChannel | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
@@ -64,11 +75,15 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isCreatingLiveAgent, setIsCreatingLiveAgent] = useState(false);
+  const [isStartingWebCall, setIsStartingWebCall] = useState(false);
+  const [isWebCallActive, setIsWebCallActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<PromptDraft | null>(null);
   const [agentName, setAgentName] = useState("Front Desk Core Receptionist");
   const [createdLiveAgent, setCreatedLiveAgent] = useState<LiveAgentConfig | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [webCallStatus, setWebCallStatus] = useState<string | null>(null);
+  const [webCallEvents, setWebCallEvents] = useState<string[]>([]);
 
   const combinedTranscript = useMemo(() => {
     return `${transcript}${interimTranscript ? ` ${interimTranscript}` : ""}`.trim();
@@ -80,8 +95,49 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
+      stopWebCall();
     };
   }, []);
+
+  function stopWebCall() {
+    if (dataChannelRef.current) {
+      try {
+        dataChannelRef.current.close();
+      } catch {
+        // ignore cleanup errors
+      }
+      dataChannelRef.current = null;
+    }
+
+    if (peerConnectionRef.current) {
+      try {
+        peerConnectionRef.current.close();
+      } catch {
+        // ignore cleanup errors
+      }
+      peerConnectionRef.current = null;
+    }
+
+    if (localStreamRef.current) {
+      for (const track of localStreamRef.current.getTracks()) {
+        track.stop();
+      }
+      localStreamRef.current = null;
+    }
+
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.pause();
+      remoteAudioRef.current.srcObject = null;
+    }
+
+    setIsWebCallActive(false);
+    setIsStartingWebCall(false);
+  }
+
+  function appendWebCallEvent(eventText: string) {
+    const timestamp = new Date().toLocaleTimeString();
+    setWebCallEvents((previous) => [`${timestamp} - ${eventText}`, ...previous].slice(0, 12));
+  }
 
   function ensureRecognition() {
     if (recognitionRef.current) {
@@ -266,6 +322,169 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     }
   }
 
+  async function startWebCall() {
+    if (!createdLiveAgent?.agentId) {
+      setError("Create a live voice agent first.");
+      return;
+    }
+
+    setError(null);
+    setIsStartingWebCall(true);
+    setWebCallStatus("Requesting microphone access...");
+    setWebCallEvents([]);
+
+    try {
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error("Microphone access is not supported in this browser.");
+      }
+
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+
+      localStreamRef.current = localStream;
+
+      setWebCallStatus("Creating secure realtime session...");
+      const secretResponse = await fetch("/api/agent/realtime-client-secret", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          agentId: createdLiveAgent.agentId,
+        }),
+      });
+
+      const secretData = (await secretResponse.json()) as RealtimeClientSecretResponse;
+      if (!secretResponse.ok || !secretData.clientSecret) {
+        throw new Error(secretData.error || "Could not start web call session");
+      }
+
+      const peerConnection = new RTCPeerConnection();
+      peerConnectionRef.current = peerConnection;
+
+      const remoteAudio = remoteAudioRef.current ?? new Audio();
+      remoteAudio.autoplay = true;
+      remoteAudioRef.current = remoteAudio;
+
+      peerConnection.ontrack = (event) => {
+        const [remoteStream] = event.streams;
+        if (remoteStream) {
+          remoteAudio.srcObject = remoteStream;
+        }
+      };
+
+      peerConnection.onconnectionstatechange = () => {
+        const state = peerConnection.connectionState;
+        if (state === "failed" || state === "disconnected" || state === "closed") {
+          setWebCallStatus("Web call disconnected.");
+          appendWebCallEvent(`Connection state: ${state}`);
+          stopWebCall();
+        }
+      };
+
+      for (const track of localStream.getTracks()) {
+        peerConnection.addTrack(track, localStream);
+      }
+
+      const dataChannel = peerConnection.createDataChannel("oai-events");
+      dataChannelRef.current = dataChannel;
+
+      dataChannel.onopen = () => {
+        appendWebCallEvent("Realtime data channel connected.");
+        setWebCallStatus("Web call live. Speak naturally.");
+
+        if (secretData.openingScript) {
+          dataChannel.send(
+            JSON.stringify({
+              type: "conversation.item.create",
+              item: {
+                type: "message",
+                role: "user",
+                content: [
+                  {
+                    type: "input_text",
+                    text: `Start by greeting the caller using this exact opening script, then continue naturally: ${secretData.openingScript}`,
+                  },
+                ],
+              },
+            })
+          );
+
+          dataChannel.send(
+            JSON.stringify({
+              type: "response.create",
+            })
+          );
+        }
+      };
+
+      dataChannel.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data) as { type?: string; transcript?: string; delta?: string };
+
+          if (payload.type === "response.audio_transcript.done" && payload.transcript) {
+            appendWebCallEvent(`Agent: ${payload.transcript}`);
+            return;
+          }
+
+          if (payload.type === "conversation.item.input_audio_transcription.completed" && payload.transcript) {
+            appendWebCallEvent(`You: ${payload.transcript}`);
+            return;
+          }
+
+          if (payload.type) {
+            appendWebCallEvent(payload.type);
+          }
+        } catch {
+          appendWebCallEvent("Received realtime event");
+        }
+      };
+
+      dataChannel.onerror = () => {
+        appendWebCallEvent("Realtime data channel error.");
+      };
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+
+      if (!offer.sdp) {
+        throw new Error("Could not create WebRTC offer.");
+      }
+
+      setWebCallStatus("Connecting to realtime voice...");
+      const realtimeResponse = await fetch("https://api.openai.com/v1/realtime/calls", {
+        method: "POST",
+        body: offer.sdp,
+        headers: {
+          Authorization: `Bearer ${secretData.clientSecret}`,
+          "Content-Type": "application/sdp",
+        },
+      });
+
+      if (!realtimeResponse.ok) {
+        const realtimeErrorText = await realtimeResponse.text();
+        throw new Error(realtimeErrorText || "Realtime connection failed.");
+      }
+
+      const answerSdp = await realtimeResponse.text();
+      await peerConnection.setRemoteDescription({
+        type: "answer",
+        sdp: answerSdp,
+      });
+
+      setIsWebCallActive(true);
+      appendWebCallEvent(`Connected with model: ${secretData.model ?? "gpt-realtime"}`);
+      setWebCallStatus("Web call active.");
+    } catch (startError: unknown) {
+      stopWebCall();
+      setError(startError instanceof Error ? startError.message : "Could not start web call");
+      setWebCallStatus("Web call failed to start.");
+    } finally {
+      setIsStartingWebCall(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-10">
@@ -443,7 +662,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
             </div>
 
             {createdLiveAgent && (
-              <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="space-y-4 rounded-xl border border-white/10 bg-black/20 p-4">
                 <p className="text-sm text-white">
                   Live agent ready: <span className="text-neon font-semibold">{createdLiveAgent.name}</span>
                 </p>
@@ -477,6 +696,63 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 <p className="text-xs text-gray-300">
                   Set this URL in Twilio (Phone Number - Voice - A call comes in) using HTTP POST.
                 </p>
+
+                <div className="rounded-xl border border-white/10 bg-ocean-950/60 p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-[11px] font-mono uppercase tracking-wider text-gray-300">Web Call Lab</p>
+                    {isWebCallActive ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          stopWebCall();
+                          setWebCallStatus("Web call ended.");
+                        }}
+                        className="inline-flex items-center gap-2 rounded-lg border border-rose-300/40 px-3 py-2 text-xs font-mono uppercase tracking-widest text-rose-200 hover:bg-rose-300/10"
+                      >
+                        <PhoneOff className="h-3.5 w-3.5" />
+                        End Web Call
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={startWebCall}
+                        disabled={isStartingWebCall}
+                        className="inline-flex items-center gap-2 rounded-lg border border-neon/40 px-3 py-2 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 disabled:opacity-60"
+                      >
+                        {isStartingWebCall ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            Connecting
+                          </>
+                        ) : (
+                          <>
+                            <PhoneCall className="h-3.5 w-3.5" />
+                            Start Web Call
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-gray-300">
+                    Test this same live agent in-browser (mic required) before routing real phone traffic.
+                  </p>
+
+                  {webCallStatus && <p className="text-xs text-gray-200">{webCallStatus}</p>}
+
+                  {webCallEvents.length > 0 && (
+                    <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+                      <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Realtime Events</p>
+                      <div className="space-y-1">
+                        {webCallEvents.map((eventLine) => (
+                          <p key={eventLine} className="text-xs text-gray-300 break-words">
+                            {eventLine}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

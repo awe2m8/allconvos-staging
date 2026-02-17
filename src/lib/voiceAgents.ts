@@ -139,3 +139,24 @@ export async function getVoiceAgentById(agentId: string): Promise<VoiceAgentReco
 
   return mapVoiceAgentRow(data as Record<string, unknown>);
 }
+
+export async function getVoiceAgentForUser(userId: string, agentId: string): Promise<VoiceAgentRecord | null> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from("voice_agents")
+    .select("id, user_id, name, plan, status, business_summary, tasks, personality, guardrails, opening_script, system_prompt, created_at, updated_at")
+    .eq("id", agentId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return mapVoiceAgentRow(data as Record<string, unknown>);
+}

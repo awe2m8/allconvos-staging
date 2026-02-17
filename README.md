@@ -86,3 +86,11 @@ App routes:
 The call path is:
 
 `Twilio Number -> /api/twilio/voice/incoming -> Twilio Media Stream -> voice-bridge -> OpenAI Realtime`
+
+## Web Call Lab flow
+
+After creating a live agent in `/app/onboarding`, use `Start Web Call` to test that same agent in-browser.
+
+Path:
+
+`Browser mic -> /api/agent/realtime-client-secret -> OpenAI Realtime (WebRTC) -> Browser audio playback`
