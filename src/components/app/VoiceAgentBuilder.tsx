@@ -29,6 +29,11 @@ interface CreateLiveAgentResponse {
   error?: string;
 }
 
+interface LatestLiveAgentResponse {
+  agent?: (LiveAgentConfig & { draft?: PromptDraft }) | null;
+  error?: string;
+}
+
 interface RealtimeClientSecretResponse {
   clientSecret?: string;
   model?: string;
@@ -122,6 +127,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [provisionedTwilioNumbers, setProvisionedTwilioNumbers] = useState<TwilioProvisionedNumber[]>([]);
   const [provisioningNumber, setProvisioningNumber] = useState<string | null>(null);
   const [provisionSuccessMessage, setProvisionSuccessMessage] = useState<string | null>(null);
+  const [isLoadingSavedAgent, setIsLoadingSavedAgent] = useState(true);
 
   const combinedTranscript = useMemo(() => {
     return `${transcript}${interimTranscript ? ` ${interimTranscript}` : ""}`.trim();
@@ -135,6 +141,51 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function hydrateLatestLiveAgent() {
+      setIsLoadingSavedAgent(true);
+      try {
+        const response = await fetch("/api/agent/latest-live");
+        const data = (await response.json()) as LatestLiveAgentResponse;
+
+        if (!response.ok) {
+          throw new Error(data.error || "Could not load saved live agent");
+        }
+
+        if (!data.agent || cancelled) {
+          return;
+        }
+
+        setCreatedLiveAgent({
+          agentId: data.agent.agentId,
+          name: data.agent.name,
+          plan: data.agent.plan,
+          twilioWebhookUrl: data.agent.twilioWebhookUrl,
+        });
+        if (data.agent.draft) {
+          setDraft(data.agent.draft);
+        }
+        setAgentName(data.agent.name);
+      } catch (hydrateError: unknown) {
+        if (!cancelled) {
+          setError(hydrateError instanceof Error ? hydrateError.message : "Could not load saved live agent");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingSavedAgent(false);
+        }
+      }
+    }
+
+    void hydrateLatestLiveAgent();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (!createdLiveAgent?.agentId) {
       setTwilioSearchResults([]);
       setProvisionedTwilioNumbers([]);
@@ -144,6 +195,20 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
 
     void loadProvisionedTwilioNumbers(createdLiveAgent.agentId);
   }, [createdLiveAgent?.agentId]);
+
+  useEffect(() => {
+    if (!provisionSuccessMessage) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setProvisionSuccessMessage(null);
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [provisionSuccessMessage]);
 
   function stopWebCall() {
     if (dataChannelRef.current) {
@@ -610,6 +675,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
             Active plan: <span className="text-neon font-semibold">{planName}</span>. Speak about your business, then generate a structured
             receptionist prompt with tasks, personality, and guard rails.
           </p>
+          {isLoadingSavedAgent && <p className="text-xs text-gray-400">Loading your saved agent...</p>}
         </div>
 
         <div className="flex justify-center mt-8">

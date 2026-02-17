@@ -160,3 +160,27 @@ export async function getVoiceAgentForUser(userId: string, agentId: string): Pro
 
   return mapVoiceAgentRow(data as Record<string, unknown>);
 }
+
+export async function getLatestActiveVoiceAgentForUser(userId: string): Promise<VoiceAgentRecord | null> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from("voice_agents")
+    .select("id, user_id, name, plan, status, business_summary, tasks, personality, guardrails, opening_script, system_prompt, created_at, updated_at")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("updated_at", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw error;
+  }
+
+  const row = data?.[0] as Record<string, unknown> | undefined;
+  if (!row) {
+    return null;
+  }
+
+  return mapVoiceAgentRow(row);
+}
