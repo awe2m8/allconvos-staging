@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Loader2, Mic, PhoneCall, PhoneOff, Square, Wand2 } from "lucide-react";
+import { Check, Copy, Loader2, PhoneCall, PhoneOff, Wand2 } from "lucide-react";
 
 interface PromptDraft {
   businessSummary: string;
@@ -607,17 +607,18 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
         </div>
 
         <div className="flex justify-center mt-8">
-          <div
-            role="status"
-            aria-live="polite"
+          <button
+            type="button"
+            onClick={isListening ? stopListening : startListening}
+            aria-pressed={isListening}
             className={`flex h-52 w-52 items-center justify-center rounded-full border font-mono text-sm uppercase tracking-[0.16em] transition-all ${
               isListening
                 ? "border-neon bg-neon text-ocean-950 shadow-[0_0_80px_rgba(16,248,194,0.3)] animate-pulse"
-                : "border-neon/50 bg-neon/10 text-neon shadow-[0_0_80px_rgba(16,248,194,0.2)]"
+                : "border-neon/50 bg-neon/10 text-neon shadow-[0_0_80px_rgba(16,248,194,0.2)] hover:bg-neon/20"
             }`}
           >
             {isListening ? "Listening..." : "Ready to record"}
-          </div>
+          </button>
         </div>
 
         <div className="mt-8 grid lg:grid-cols-[1fr_auto] gap-4">
@@ -626,30 +627,12 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
               <textarea
                 readOnly
                 value={combinedTranscript}
-                placeholder="Tap ‘Record’ and speak naturally about your business, common caller requests, tone of voice, and non-negotiable rules."
+                placeholder="Tap the big button and speak naturally about your business, common caller requests, tone of voice, and non-negotiable rules."
                 className="w-full min-h-[180px] resize-y rounded-xl border border-white/10 bg-ocean-950/60 px-3 py-3 text-sm text-gray-200 outline-none"
               />
             </div>
 
           <div className="flex lg:flex-col items-stretch gap-3">
-            <button
-              type="button"
-              onClick={isListening ? stopListening : startListening}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-4 py-3 text-xs font-mono uppercase tracking-widest text-white hover:bg-white/10 transition-colors"
-            >
-              {isListening ? (
-                <>
-                  <Square className="h-4 w-4" />
-                  Stop
-                </>
-              ) : (
-                <>
-                  <Mic className="h-4 w-4" />
-                  Record
-                </>
-              )}
-            </button>
-
             <button
               type="button"
               onClick={buildPrompt}
