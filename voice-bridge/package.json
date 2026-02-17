@@ -1,0 +1,13 @@
+{
+  "name": "voice-bridge",
+  "private": true,
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "ws": "^8.18.0"
+  }
+}
