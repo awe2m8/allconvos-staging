@@ -720,61 +720,64 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
       </div>
 
       {draft && (
-        <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8 space-y-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_460px]">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8 space-y-6">
             <h2 className="text-2xl font-bold text-white">Generated Agent Draft</h2>
-            <button
-              type="button"
-              onClick={playVoicePreview}
-              disabled={isSpeaking}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-neon/40 px-4 py-3 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 transition-colors disabled:opacity-60"
-            >
-              <Volume2 className="h-4 w-4" />
-              {isSpeaking ? "Playing..." : "Voice Preview"}
-            </button>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Tasks</p>
-              <ul className="space-y-2 text-sm text-gray-200">
-                {draft.tasks.map((task) => (
-                  <li key={task}>- {task}</li>
-                ))}
-              </ul>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Tasks</p>
+                <ul className="space-y-2 text-sm text-gray-200">
+                  {draft.tasks.map((task) => (
+                    <li key={task}>- {task}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Personality</p>
+                <ul className="space-y-2 text-sm text-gray-200">
+                  {draft.personality.map((item) => (
+                    <li key={item}>- {item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Guard Rails</p>
+                <ul className="space-y-2 text-sm text-gray-200">
+                  {draft.guardrails.map((rule) => (
+                    <li key={rule}>- {rule}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Personality</p>
-              <ul className="space-y-2 text-sm text-gray-200">
-                {draft.personality.map((item) => (
-                  <li key={item}>- {item}</li>
-                ))}
-              </ul>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 space-y-3">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">Opening Script</p>
+              <p className="text-sm text-gray-200">{draft.openingScript}</p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400 mb-2">Guard Rails</p>
-              <ul className="space-y-2 text-sm text-gray-200">
-                {draft.guardrails.map((rule) => (
-                  <li key={rule}>- {rule}</li>
-                ))}
-              </ul>
+            <div className="rounded-2xl border border-white/10 bg-ocean-950/70 p-4 space-y-3">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">System Prompt</p>
+              <pre className="whitespace-pre-wrap text-xs text-gray-200 font-mono">{draft.systemPrompt}</pre>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-black/20 p-4 space-y-3">
-            <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">Opening Script</p>
-            <p className="text-sm text-gray-200">{draft.openingScript}</p>
-          </div>
+          <div className="rounded-3xl border border-neon/30 bg-neon/5 p-5 md:p-6 space-y-4 lg:sticky lg:top-6">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-neon">Go Live with Twilio</p>
+              <button
+                type="button"
+                onClick={playVoicePreview}
+                disabled={isSpeaking}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-neon/40 px-3 py-2 text-[11px] font-mono uppercase tracking-widest text-neon hover:bg-neon/10 transition-colors disabled:opacity-60"
+              >
+                <Volume2 className="h-3.5 w-3.5" />
+                {isSpeaking ? "Playing..." : "Voice Preview"}
+              </button>
+            </div>
 
-          <div className="rounded-2xl border border-white/10 bg-ocean-950/70 p-4 space-y-3">
-            <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">System Prompt</p>
-            <pre className="whitespace-pre-wrap text-xs text-gray-200 font-mono">{draft.systemPrompt}</pre>
-          </div>
-
-          <div className="rounded-2xl border border-neon/30 bg-neon/5 p-4 space-y-4">
-            <p className="text-[11px] font-mono uppercase tracking-wider text-neon">Go Live with Twilio</p>
             <div className="grid gap-3 md:grid-cols-[1fr_auto]">
               <input
                 value={agentName}
@@ -800,7 +803,11 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
               </button>
             </div>
 
-            {createdLiveAgent && (
+            {!createdLiveAgent ? (
+              <p className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-xs text-gray-300">
+                Create a live voice agent to unlock webhook setup, web-call testing, and Twilio number provisioning.
+              </p>
+            ) : (
               <div className="space-y-4 rounded-xl border border-white/10 bg-black/20 p-4">
                 <p className="text-sm text-white">
                   Live agent ready: <span className="text-neon font-semibold">{createdLiveAgent.name}</span>
