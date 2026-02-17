@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignOutButton, SignedIn, useUser } from "@clerk/nextjs";
+import { Box, LogOut, UserCircle2 } from "lucide-react";
 import { appUrl } from "@/lib/siteUrls";
 
 export function AuthSessionIndicator() {
@@ -18,27 +19,35 @@ export function AuthSessionIndicator() {
   const userLabel = user?.primaryEmailAddress?.emailAddress ?? user?.fullName ?? "Account";
 
   return (
-    <div className="fixed bottom-4 right-4 z-[70]">
+    <div className="fixed bottom-4 left-4 z-[60]">
       <SignedIn>
-        <div className="rounded-xl border border-white/15 bg-ocean-950/90 px-4 py-3 shadow-2xl backdrop-blur-md min-w-[220px]">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-gray-300">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            Logged In
+        <div className="min-w-[260px] rounded-2xl border border-[#24406a] bg-[#08152a]/95 p-4 shadow-xl backdrop-blur-md">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center rounded-md bg-gradient-to-r from-pink-500 to-amber-400 px-3 py-1 text-xs font-bold tracking-wide text-white">
+              LITE
+            </div>
+            <span className="text-[11px] font-mono uppercase tracking-widest text-[#8aa2c5]">Logged In</span>
           </div>
-          <p className="mt-1 truncate text-[11px] font-mono text-gray-400">{userLabel}</p>
-          <div className="mt-3 flex items-center gap-2">
+
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center gap-2 text-[#a8b7cd]">
+              <UserCircle2 className="h-4 w-4 shrink-0" />
+              <p className="truncate text-sm font-medium">{userLabel}</p>
+            </div>
             <Link
               href={appHomeUrl}
-              className="inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-white hover:bg-white/10"
+              className="flex items-center gap-2 text-[#a8b7cd] hover:text-white transition-colors"
             >
-              Open App
+              <Box className="h-4 w-4 shrink-0" />
+              <span className="text-sm font-medium">Open App</span>
             </Link>
             <SignOutButton redirectUrl={loginUrl}>
               <button
                 type="button"
-                className="inline-flex items-center justify-center rounded-lg border border-neon/40 px-3 py-1.5 text-[11px] font-mono uppercase tracking-widest text-neon hover:bg-neon/10"
+                className="flex w-full items-center gap-2 text-left text-[#a8b7cd] hover:text-white transition-colors"
               >
-                Logout
+                <LogOut className="h-4 w-4 shrink-0" />
+                <span className="text-sm font-medium">Sign Out</span>
               </button>
             </SignOutButton>
           </div>
