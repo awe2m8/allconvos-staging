@@ -26,6 +26,25 @@ create table if not exists public.onboarding_progress (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.voice_agents (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null,
+  name text not null,
+  plan text not null,
+  status text not null default 'active',
+  business_summary text not null,
+  tasks jsonb not null default '[]'::jsonb,
+  personality jsonb not null default '[]'::jsonb,
+  guardrails jsonb not null default '[]'::jsonb,
+  opening_script text not null,
+  system_prompt text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists voice_agents_user_id_idx on public.voice_agents(user_id);
+create index if not exists voice_agents_status_idx on public.voice_agents(status);
+
 create or replace function public.set_updated_at_timestamp()
 returns trigger
 language plpgsql
@@ -48,9 +67,16 @@ before update on public.onboarding_progress
 for each row
 execute function public.set_updated_at_timestamp();
 
+drop trigger if exists voice_agents_set_updated_at on public.voice_agents;
+create trigger voice_agents_set_updated_at
+before update on public.voice_agents
+for each row
+execute function public.set_updated_at_timestamp();
+
 -- Tighten these policies to your exact service model.
 alter table public.subscriptions enable row level security;
 alter table public.onboarding_progress enable row level security;
+alter table public.voice_agents enable row level security;
 
 create policy "Service role full access subscriptions"
 on public.subscriptions
@@ -60,6 +86,12 @@ with check (auth.role() = 'service_role');
 
 create policy "Service role full access onboarding_progress"
 on public.onboarding_progress
+for all
+using (auth.role() = 'service_role')
+with check (auth.role() = 'service_role');
+
+create policy "Service role full access voice_agents"
+on public.voice_agents
 for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');

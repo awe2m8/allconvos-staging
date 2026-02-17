@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, Mic, Square, Volume2, Wand2 } from "lucide-react";
+import { Check, Copy, Loader2, Mic, Square, Volume2, Wand2 } from "lucide-react";
 
 interface PromptDraft {
   businessSummary: string;
@@ -14,6 +14,18 @@ interface PromptDraft {
 
 interface BuildPromptResponse {
   draft?: PromptDraft;
+  error?: string;
+}
+
+interface LiveAgentConfig {
+  agentId: string;
+  name: string;
+  plan: string;
+  twilioWebhookUrl: string;
+}
+
+interface CreateLiveAgentResponse {
+  agent?: LiveAgentConfig;
   error?: string;
 }
 
@@ -51,8 +63,12 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [isListening, setIsListening] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isCreatingLiveAgent, setIsCreatingLiveAgent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<PromptDraft | null>(null);
+  const [agentName, setAgentName] = useState("Front Desk Core Receptionist");
+  const [createdLiveAgent, setCreatedLiveAgent] = useState<LiveAgentConfig | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const combinedTranscript = useMemo(() => {
     return `${transcript}${interimTranscript ? ` ${interimTranscript}` : ""}`.trim();
@@ -169,6 +185,8 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
       }
 
       setDraft(data.draft);
+      setCreatedLiveAgent(null);
+      setCopiedField(null);
     } catch (buildError: unknown) {
       setError(buildError instanceof Error ? buildError.message : "Could not build prompt");
     } finally {
@@ -200,6 +218,52 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     };
 
     window.speechSynthesis.speak(utterance);
+  }
+
+  async function createLiveAgent() {
+    if (!draft) {
+      setError("Generate a draft first.");
+      return;
+    }
+
+    setError(null);
+    setIsCreatingLiveAgent(true);
+
+    try {
+      const response = await fetch("/api/agent/create-live", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: agentName,
+          draft,
+        }),
+      });
+
+      const data = (await response.json()) as CreateLiveAgentResponse;
+      if (!response.ok || !data.agent) {
+        throw new Error(data.error || "Could not create live agent");
+      }
+
+      setCreatedLiveAgent(data.agent);
+    } catch (createError: unknown) {
+      setError(createError instanceof Error ? createError.message : "Could not create live agent");
+    } finally {
+      setIsCreatingLiveAgent(false);
+    }
+  }
+
+  async function copyToClipboard(value: string, fieldName: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(fieldName);
+      setTimeout(() => {
+        setCopiedField((current) => (current === fieldName ? null : current));
+      }, 1500);
+    } catch {
+      setError("Could not copy to clipboard.");
+    }
   }
 
   return (
@@ -283,6 +347,8 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 setTranscript("");
                 setInterimTranscript("");
                 setDraft(null);
+                setCreatedLiveAgent(null);
+                setCopiedField(null);
                 setError(null);
               }}
               className="inline-flex items-center justify-center rounded-xl border border-white/15 px-4 py-3 text-xs font-mono uppercase tracking-widest text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
@@ -347,6 +413,72 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
           <div className="rounded-2xl border border-white/10 bg-ocean-950/70 p-4 space-y-3">
             <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">System Prompt</p>
             <pre className="whitespace-pre-wrap text-xs text-gray-200 font-mono">{draft.systemPrompt}</pre>
+          </div>
+
+          <div className="rounded-2xl border border-neon/30 bg-neon/5 p-4 space-y-4">
+            <p className="text-[11px] font-mono uppercase tracking-wider text-neon">Go Live with Twilio</p>
+            <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+              <input
+                value={agentName}
+                onChange={(event) => setAgentName(event.target.value)}
+                maxLength={80}
+                placeholder="Agent name"
+                className="h-11 rounded-xl border border-white/10 bg-ocean-950/60 px-3 text-sm text-white outline-none focus:border-neon/40"
+              />
+              <button
+                type="button"
+                onClick={createLiveAgent}
+                disabled={isCreatingLiveAgent}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-neon px-4 text-xs font-mono uppercase tracking-widest text-ocean-950 hover:bg-white transition-colors disabled:opacity-50"
+              >
+                {isCreatingLiveAgent ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creating
+                  </>
+                ) : (
+                  "Create Live Voice Agent"
+                )}
+              </button>
+            </div>
+
+            {createdLiveAgent && (
+              <div className="space-y-3 rounded-xl border border-white/10 bg-black/20 p-4">
+                <p className="text-sm text-white">
+                  Live agent ready: <span className="text-neon font-semibold">{createdLiveAgent.name}</span>
+                </p>
+
+                <div className="space-y-2">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-gray-400">Twilio Voice Webhook URL</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <code className="flex-1 min-w-[220px] break-all rounded-lg border border-white/10 bg-ocean-950/70 px-3 py-2 text-xs text-gray-200">
+                      {createdLiveAgent.twilioWebhookUrl}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(createdLiveAgent.twilioWebhookUrl, "twilioWebhook")}
+                      className="inline-flex items-center gap-2 rounded-lg border border-white/15 px-3 py-2 text-xs font-mono uppercase tracking-widest text-gray-200 hover:bg-white/10"
+                    >
+                      {copiedField === "twilioWebhook" ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy URL
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-gray-300">
+                  Set this URL in Twilio (Phone Number - Voice - A call comes in) using HTTP POST.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

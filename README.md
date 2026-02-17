@@ -28,12 +28,19 @@ STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 STRIPE_PRICE_LITE=
 
-# Optional: AI prompt generation for voice-builder (falls back if missing)
+# Optional: AI prompt generation + realtime voice
 OPENAI_API_KEY=
+OPENAI_REALTIME_MODEL=gpt-realtime
+OPENAI_REALTIME_VOICE=alloy
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# Twilio -> OpenAI realtime bridge websocket URL
+# Example local:
+# VOICE_BRIDGE_WS_URL=ws://localhost:8081/twilio-media-stream
+VOICE_BRIDGE_WS_URL=
 ```
 
 ## Supabase schema
@@ -42,13 +49,19 @@ Run:
 
 `supabase/schema.sql`
 
-in the Supabase SQL editor before using billing/onboarding routes.
+in the Supabase SQL editor before using billing/onboarding/voice-agent routes.
 
 ## Development
 
 ```bash
 npm install
 npm run dev
+```
+
+Standalone Twilio/OpenAI bridge process:
+
+```bash
+npm run voice:bridge
 ```
 
 App routes:
@@ -58,3 +71,18 @@ App routes:
 - `/billing/checkout`
 - `/billing/success`
 - `/app/onboarding`
+
+## Twilio + OpenAI Realtime flow
+
+1. Build a receptionist draft in `/app/onboarding`.
+2. Click `Create Live Voice Agent` and copy the returned Twilio webhook URL.
+3. In Twilio (Phone Number -> Voice), set:
+   - Webhook URL: that generated `/api/twilio/voice/incoming?agentId=...` URL
+   - Method: `HTTP POST`
+4. Deploy/run the bridge (`voice-bridge/server.mjs`) on a public host with TLS.
+5. Set `VOICE_BRIDGE_WS_URL` in this app to the bridge websocket endpoint:
+   - `wss://your-bridge-domain/twilio-media-stream`
+
+The call path is:
+
+`Twilio Number -> /api/twilio/voice/incoming -> Twilio Media Stream -> voice-bridge -> OpenAI Realtime`
