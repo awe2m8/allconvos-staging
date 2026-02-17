@@ -4,7 +4,6 @@ import React, { useState, Suspense, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Shield, ArrowLeft, Loader2, CreditCard } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import stripePromise from "@/lib/stripe";
 
@@ -27,27 +26,6 @@ const plans = [
         duration: "/mo",
         description: "One receptionist. Fully autonomous. Always on.",
         features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications", "+ One-time onboarding fee (tailored)"],
-        color: "border-blue-400",
-        accent: "text-blue-400",
-    },
-    {
-        id: "pro",
-        name: "LEAD_ENGINE",
-        price: 599,
-        priceDisplay: "$599",
-        duration: "/mo",
-        description: "Handles leads from calls, SMS and web forms — end to end. (Includes Voice AI Receptionist)",
-        features: [
-            "Multi agents",
-            "Calls + SMS + web forms included",
-            "Lead capture + instant responses",
-            "Automatic qualification + tagging",
-            "Ongoing follow-up & nurturing",
-            "CRM sync (HighLevel, etc.)",
-            "Priority support",
-            "Everything in Front Desk",
-            "+ One-time onboarding fee (tailored)"
-        ],
         color: "border-neon",
         accent: "text-neon",
         popular: true,
@@ -74,8 +52,7 @@ const cardElementOptions = {
 };
 
 function CheckoutForm() {
-    const searchParams = useSearchParams();
-    const initialPlan = searchParams.get("plan") || "pro";
+    const initialPlan = "lite";
 
     const stripe = useStripe();
     const elements = useElements();
@@ -96,7 +73,7 @@ function CheckoutForm() {
         }
     }, []);
 
-    const currentPlan = plans.find(p => p.id === selectedPlan) || plans[1];
+    const currentPlan = plans.find(p => p.id === selectedPlan) || plans[0];
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({

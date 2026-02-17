@@ -1,4 +1,4 @@
-export const PLAN_IDS = ["lite", "pro"] as const;
+export const PLAN_IDS = ["lite"] as const;
 
 export type PlanId = (typeof PLAN_IDS)[number];
 
@@ -14,21 +14,16 @@ export const PLAN_DETAILS: Record<PlanId, {
     monthlyPriceLabel: "$399/mo",
     description: "One receptionist. Fully autonomous. Always on.",
   },
-  pro: {
-    name: "LEAD_ENGINE",
-    monthlyPriceLabel: "$599/mo",
-    description: "Handles leads from calls, SMS and web forms end to end.",
-  },
 };
 
 export const STRIPE_PRICE_IDS: Record<PlanId, string | undefined> = {
   lite: process.env.STRIPE_PRICE_LITE,
-  pro: process.env.STRIPE_PRICE_PRO,
 };
 
 export function normalizePlanId(rawPlan: string | null | undefined): PlanId {
   if (rawPlan === "lite" || rawPlan === "pro") {
-    return rawPlan;
+    // Legacy `pro` links now resolve to Front Desk Core.
+    return "lite";
   }
 
   return DEFAULT_PLAN_ID;

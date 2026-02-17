@@ -3,7 +3,6 @@ import Stripe from 'stripe';
 
 const PRICE_IDS = {
     lite: process.env.STRIPE_PRICE_LITE || '',
-    pro: process.env.STRIPE_PRICE_PRO || '',
 } as const;
 
 type PlanId = keyof typeof PRICE_IDS;
@@ -25,7 +24,7 @@ function isNonEmptyString(value: unknown): value is string {
 }
 
 function isPlanId(value: unknown): value is PlanId {
-    return value === 'lite' || value === 'pro';
+    return value === 'lite';
 }
 
 export async function POST(request: NextRequest) {

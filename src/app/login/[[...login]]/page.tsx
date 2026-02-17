@@ -1,4 +1,5 @@
 import { SignIn } from "@clerk/nextjs";
+import { normalizePlanId } from "@/lib/billing";
 import { appUrl } from "@/lib/siteUrls";
 
 interface LoginPageProps {
@@ -21,10 +22,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const rawPlan = readSingleParam(params.plan);
   const hasExplicitPlan = rawPlan === "lite" || rawPlan === "pro";
+  const selectedPlanId = normalizePlanId(rawPlan);
   const fallbackRedirectUrl = hasExplicitPlan
-    ? appUrl(`/start?plan=${rawPlan}`)
+    ? appUrl(`/start?plan=${selectedPlanId}`)
     : appUrl("/app/onboarding");
-  const signUpUrl = hasExplicitPlan ? appUrl(`/signup?plan=${rawPlan}`) : appUrl("/signup");
+  const signUpUrl = hasExplicitPlan ? appUrl(`/signup?plan=${selectedPlanId}`) : appUrl("/signup");
 
   return (
     <main className="min-h-screen bg-ocean-950 flex items-center justify-center px-6 py-20">

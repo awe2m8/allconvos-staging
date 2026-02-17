@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { CheckoutPlanOptions } from "@/components/billing/CheckoutPlanOptions";
-import { DEFAULT_PLAN_ID, PlanId } from "@/lib/billing";
+import { CheckoutButton } from "@/components/billing/CheckoutButton";
+import { DEFAULT_PLAN_ID, PLAN_DETAILS } from "@/lib/billing";
 import { appUrl, marketingUrl } from "@/lib/siteUrls";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 
@@ -25,13 +25,14 @@ function readSingleParam(raw: string | string[] | undefined): string | undefined
 export default async function BillingCheckoutPage({ searchParams }: BillingCheckoutPageProps) {
   const params = await searchParams;
   const rawPlan = readSingleParam(params.plan);
-  const hasExplicitPlan = rawPlan === "lite" || rawPlan === "pro";
-  const requestedPlan: PlanId = hasExplicitPlan ? rawPlan : DEFAULT_PLAN_ID;
+  const hasExplicitPlan = rawPlan === "lite";
+  const selectedPlanId = DEFAULT_PLAN_ID;
+  const selectedPlan = PLAN_DETAILS[selectedPlanId];
 
   const { userId } = await auth();
   if (!userId) {
-    if (hasExplicitPlan) {
-      redirect(appUrl(`/signup?plan=${requestedPlan}`));
+    if (hasExplicitPlan || rawPlan === "pro") {
+      redirect(appUrl(`/signup?plan=${selectedPlanId}`));
     }
     redirect(appUrl("/signup"));
   }
@@ -55,11 +56,34 @@ export default async function BillingCheckoutPage({ searchParams }: BillingCheck
               {hasExplicitPlan ? "Confirm your selected plan" : "Choose your allconvos plan"}
             </h1>
             <p className="text-gray-400 mt-2 text-sm">
-              Pick Front Desk Core or Lead Engine. You can upgrade later from billing.
+              Front Desk Core is the live Stripe plan. Custom setup is available by request.
             </p>
           </div>
 
-          <CheckoutPlanOptions requestedPlan={requestedPlan} showOnlyRequested={hasExplicitPlan} />
+          <div className="grid md:grid-cols-2 gap-5">
+            <section className="rounded-xl border border-neon/50 p-5 space-y-4 bg-black/30">
+              <div className="space-y-1">
+                <p className="text-white font-semibold">{selectedPlan.name}</p>
+                <p className="text-gray-400 text-xs">{selectedPlan.description}</p>
+              </div>
+              <p className="text-neon font-bold text-2xl">{selectedPlan.monthlyPriceLabel}</p>
+              <CheckoutButton planId={selectedPlanId} label="Choose Front Desk Core" />
+            </section>
+
+            <section className="rounded-xl border border-white/10 p-5 space-y-4 bg-black/30">
+              <div className="space-y-1">
+                <p className="text-white font-semibold">ELITE_OVERSEER (CUSTOM)</p>
+                <p className="text-gray-400 text-xs">Custom multi-location and orchestration setup.</p>
+              </div>
+              <p className="text-white font-bold text-2xl">Custom</p>
+              <Link
+                href={marketingUrl("/contact")}
+                className="w-full inline-flex items-center justify-center rounded-xl px-5 py-4 font-mono uppercase tracking-widest text-xs border border-white/15 text-white hover:bg-white/10 transition-colors"
+              >
+                Request Intel
+              </Link>
+            </section>
+          </div>
 
           <p className="text-[11px] text-gray-500 font-mono">
             By continuing, you will complete payment in Stripe. Your onboarding access is granted after successful payment.

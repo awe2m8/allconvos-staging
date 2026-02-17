@@ -8,12 +8,11 @@ import { useSearchParams } from "next/navigation";
 
 const planNames: Record<string, string> = {
     lite: "FRONT_DESK_CORE",
-    pro: "LEAD_ENGINE",
 };
 
 function SuccessContent() {
     const searchParams = useSearchParams();
-    const planId = searchParams.get("plan") || "pro";
+    const planId = searchParams.get("plan") || "lite";
     const planName = planNames[planId] || "Your Plan";
 
     return (

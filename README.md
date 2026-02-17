@@ -27,7 +27,6 @@ NEXT_PUBLIC_MARKETING_URL=https://your-domain.com
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 STRIPE_PRICE_LITE=
-STRIPE_PRICE_PRO=
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
@@ -52,7 +51,7 @@ npm run dev
 App routes:
 - `/login`
 - `/signup`
-- `/start?plan=lite|pro`
+- `/start?plan=lite`
 - `/billing/checkout`
 - `/billing/success`
 - `/app/onboarding`

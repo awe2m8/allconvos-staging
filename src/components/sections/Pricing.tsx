@@ -16,28 +16,6 @@ const plans = [
         features: ["24/7 AI Receptionist", "Calendar Integration", "CRM Lite", "Limited voices and accents", "SMS Notifications", "+ One-time onboarding fee (tailored)"],
         color: "text-blue-400",
         bg: "bg-blue-400/5",
-        border: "border-blue-400/20"
-    },
-    {
-        id: "pro",
-        name: "LEAD_ENGINE",
-        price: "$599",
-        duration: "/mo",
-        onboardingNote: "+ One-time onboarding fee (tailored)",
-        description: "Handles leads from calls, SMS and web forms — end to end. (Includes Voice AI Receptionist)",
-        features: [
-            "Multi agents",
-            "Calls + SMS + web forms included",
-            "Lead capture + instant responses",
-            "Automatic qualification + tagging",
-            "Ongoing follow-up & nurturing",
-            "CRM sync (HighLevel, etc.)",
-            "Priority support",
-            "Everything in Front Desk",
-            "+ One-time onboarding fee (tailored)"
-        ],
-        color: "text-neon",
-        bg: "bg-neon/10",
         border: "border-neon/40",
         popular: true
     },
@@ -67,7 +45,7 @@ export function Pricing() {
                     </p>
                 </div>
 
-                <div className="grid lg:grid-cols-3 gap-6 items-stretch">
+                <div className="grid lg:grid-cols-2 gap-6 items-stretch max-w-5xl mx-auto">
                     {plans.map((plan, idx) => (
                         <motion.div
                             key={idx}
@@ -119,7 +97,7 @@ export function Pricing() {
                                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                {plan.price === 'CUSTOM' ? 'Request Intel' : (plan.id === 'lite' ? 'Start Receptionist Setup' : (plan.id === 'pro' ? 'Start Pro' : 'Initialize Plan'))}
+                                {plan.price === 'CUSTOM' ? 'Request Intel' : 'Start Receptionist Setup'}
                             </Link>
 
                             {/* Decorative background badge */}
