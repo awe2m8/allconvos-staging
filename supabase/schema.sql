@@ -45,6 +45,24 @@ create table if not exists public.voice_agents (
 create index if not exists voice_agents_user_id_idx on public.voice_agents(user_id);
 create index if not exists voice_agents_status_idx on public.voice_agents(status);
 
+create table if not exists public.twilio_phone_numbers (
+  id uuid primary key default gen_random_uuid(),
+  user_id text not null,
+  agent_id text not null,
+  twilio_account_sid text not null,
+  incoming_phone_number_sid text not null unique,
+  phone_number text not null,
+  friendly_name text,
+  voice_url text,
+  status text not null default 'active',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists twilio_phone_numbers_user_id_idx on public.twilio_phone_numbers(user_id);
+create index if not exists twilio_phone_numbers_agent_id_idx on public.twilio_phone_numbers(agent_id);
+create index if not exists twilio_phone_numbers_status_idx on public.twilio_phone_numbers(status);
+
 create or replace function public.set_updated_at_timestamp()
 returns trigger
 language plpgsql
@@ -73,10 +91,17 @@ before update on public.voice_agents
 for each row
 execute function public.set_updated_at_timestamp();
 
+drop trigger if exists twilio_phone_numbers_set_updated_at on public.twilio_phone_numbers;
+create trigger twilio_phone_numbers_set_updated_at
+before update on public.twilio_phone_numbers
+for each row
+execute function public.set_updated_at_timestamp();
+
 -- Tighten these policies to your exact service model.
 alter table public.subscriptions enable row level security;
 alter table public.onboarding_progress enable row level security;
 alter table public.voice_agents enable row level security;
+alter table public.twilio_phone_numbers enable row level security;
 
 create policy "Service role full access subscriptions"
 on public.subscriptions
@@ -92,6 +117,12 @@ with check (auth.role() = 'service_role');
 
 create policy "Service role full access voice_agents"
 on public.voice_agents
+for all
+using (auth.role() = 'service_role')
+with check (auth.role() = 'service_role');
+
+create policy "Service role full access twilio_phone_numbers"
+on public.twilio_phone_numbers
 for all
 using (auth.role() = 'service_role')
 with check (auth.role() = 'service_role');

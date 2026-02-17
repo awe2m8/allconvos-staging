@@ -41,6 +41,10 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Example local:
 # VOICE_BRIDGE_WS_URL=ws://localhost:8081/twilio-media-stream
 VOICE_BRIDGE_WS_URL=
+
+# Twilio number provisioning
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
 ```
 
 ## Supabase schema
@@ -94,3 +98,11 @@ After creating a live agent in `/app/onboarding`, use `Start Web Call` to test t
 Path:
 
 `Browser mic -> /api/agent/realtime-client-secret -> OpenAI Realtime (WebRTC) -> Browser audio playback`
+
+## In-app Twilio number provisioning flow
+
+After creating a live agent in `/app/onboarding`:
+
+1. Use `Twilio Number Provisioning` to search available numbers.
+2. Click `Buy & Attach` to purchase the number and auto-point it to that agent webhook.
+3. See assigned numbers in the same panel.
