@@ -673,7 +673,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
       </div>
 
       {draft && (
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_460px]">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_520px]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 md:p-8 space-y-6">
             <h2 className="text-2xl font-bold text-white">Generated Agent Draft</h2>
 
@@ -845,7 +845,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 <div className="rounded-xl border border-white/10 bg-ocean-950/60 p-4 space-y-4">
                   <p className="text-[11px] font-mono uppercase tracking-wider text-gray-300">Twilio Number Provisioning</p>
 
-                  <div className="grid gap-3 md:grid-cols-[120px_1fr_auto]">
+                  <div className="grid gap-3 md:grid-cols-[120px_minmax(0,1fr)_164px]">
                     <input
                       value={twilioCountryCode}
                       onChange={(event) =>
@@ -864,7 +864,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                       type="button"
                       onClick={searchTwilioNumbers}
                       disabled={isSearchingTwilioNumbers}
-                      className="inline-flex h-11 items-center justify-center rounded-xl border border-neon/40 px-4 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 disabled:opacity-60"
+                      className="inline-flex h-11 w-full items-center justify-center rounded-xl border border-neon/40 px-4 text-xs font-mono uppercase tracking-widest text-neon hover:bg-neon/10 disabled:opacity-60"
                     >
                       {isSearchingTwilioNumbers ? "Searching" : "Find Numbers"}
                     </button>

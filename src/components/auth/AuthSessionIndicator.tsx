@@ -19,7 +19,7 @@ export function AuthSessionIndicator() {
   return (
     <div className="fixed bottom-4 left-4 z-[60]">
       <SignedIn>
-        <div className="min-w-[260px] rounded-2xl border border-[#24406a] bg-[#08152a]/95 p-4 shadow-xl backdrop-blur-md">
+        <div className="w-[240px] max-w-[calc(100vw-2rem)] rounded-2xl border border-[#24406a] bg-[#08152a]/95 p-4 shadow-xl backdrop-blur-md">
           <div className="flex flex-col items-start gap-2">
             <div className="inline-flex items-center rounded-md border border-neon/40 bg-neon/15 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-neon">
               FRONT DESK CORE

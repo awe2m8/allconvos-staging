@@ -21,7 +21,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="min-h-screen bg-ocean-950 py-20 px-6">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <VoiceAgentBuilder planName={plan.name} />
       </div>
     </main>
