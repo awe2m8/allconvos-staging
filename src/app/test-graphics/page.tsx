@@ -7,7 +7,15 @@ import { Bot, Phone, MessageSquare, Sparkles, Mic, Zap, Shield } from "lucide-re
 export default function TestGraphicsPage() {
     return (
         <main className="min-h-screen bg-ocean-950 text-white p-8">
-            <Script src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js" strategy="afterInteractive" />
+            <Script
+                src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js"
+                strategy="afterInteractive"
+                onLoad={() => {
+                    // This widget bootstraps on DOMContentLoaded only.
+                    // On Next.js client-rendered pages, re-fire so it can scan and mount.
+                    document.dispatchEvent(new Event("DOMContentLoaded"));
+                }}
+            />
             <div className="max-w-4xl mx-auto space-y-16">
                 <h1 className="text-2xl font-mono text-gray-500 mb-8">Test Graphics - Unlinked Page</h1>
 
