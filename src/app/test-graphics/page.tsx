@@ -1,13 +1,22 @@
 "use client";
 
 import React from "react";
+import Script from "next/script";
 import { Bot, Phone, MessageSquare, Sparkles, Mic, Zap, Shield } from "lucide-react";
 
 export default function TestGraphicsPage() {
     return (
         <main className="min-h-screen bg-ocean-950 text-white p-8">
+            <Script src="https://d2cqc7yqzf8c8f.cloudfront.net/web-widget-v1.js" strategy="afterInteractive" />
             <div className="max-w-4xl mx-auto space-y-16">
                 <h1 className="text-2xl font-mono text-gray-500 mb-8">Test Graphics - Unlinked Page</h1>
+
+                <section className="space-y-4">
+                    <p className="text-xs font-mono text-neon uppercase tracking-widest">Widget Demo Test</p>
+                    <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
+                        <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4" />
+                    </div>
+                </section>
 
                 {/* ===== VARIATION 1: Original Style with Flourish ===== */}
                 <section className="space-y-4">
