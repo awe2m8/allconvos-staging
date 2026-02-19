@@ -16,13 +16,52 @@ export default function TestGraphicsPage() {
                     document.dispatchEvent(new Event("DOMContentLoaded"));
                 }}
             />
+            <style jsx global>{`
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] {
+                    width: auto !important;
+                    display: inline-flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    margin: 0 auto !important;
+                }
+
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] .wcw-widget-wrapper {
+                    width: auto !important;
+                }
+
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container,
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container.text-mode,
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container.text-mode.idle,
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container.text-mode.always-expanded {
+                    border-radius: 50% !important;
+                    padding: 5px !important;
+                    gap: 0 !important;
+                    width: fit-content !important;
+                    max-width: none !important;
+                }
+
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container .wcw-text-container {
+                    display: none !important;
+                    width: 0 !important;
+                    margin: 0 !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                }
+
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container .wcw-state-container {
+                    width: 60px !important;
+                    height: 60px !important;
+                }
+            `}</style>
             <div className="max-w-4xl mx-auto space-y-16">
                 <h1 className="text-2xl font-mono text-gray-500 mb-8">Test Graphics - Unlinked Page</h1>
 
                 <section className="space-y-4">
                     <p className="text-xs font-mono text-neon uppercase tracking-widest">Widget Demo Test</p>
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-6">
-                        <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4" />
+                    <div className="rounded-2xl border border-neon/30 bg-gradient-to-br from-[#122540] via-[#0d1c31] to-[#091425] p-6 shadow-[0_0_40px_rgba(16,248,194,0.14)]">
+                        <div className="flex items-center justify-center">
+                            <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4" />
+                        </div>
                     </div>
                 </section>
 
