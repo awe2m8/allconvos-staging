@@ -34,10 +34,13 @@ export default function TestGraphicsPage() {
                 [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container.text-mode.idle,
                 [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container.text-mode.always-expanded {
                     border-radius: 50% !important;
-                    padding: 5px !important;
+                    padding: 0 !important;
                     gap: 0 !important;
-                    width: fit-content !important;
+                    width: auto !important;
                     max-width: none !important;
+                    background: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
                 }
 
                 [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container .wcw-text-container {
@@ -49,8 +52,13 @@ export default function TestGraphicsPage() {
                 }
 
                 [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container .wcw-state-container {
-                    width: 60px !important;
-                    height: 60px !important;
+                    width: 96px !important;
+                    height: 96px !important;
+                }
+
+                [data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4"] #web-widget-container .wcw-quiet {
+                    width: 36px !important;
+                    height: 36px !important;
                 }
             `}</style>
             <div className="max-w-4xl mx-auto space-y-16">
@@ -58,10 +66,8 @@ export default function TestGraphicsPage() {
 
                 <section className="space-y-4">
                     <p className="text-xs font-mono text-neon uppercase tracking-widest">Widget Demo Test</p>
-                    <div className="rounded-2xl border border-neon/30 bg-gradient-to-br from-[#122540] via-[#0d1c31] to-[#091425] p-6 shadow-[0_0_40px_rgba(16,248,194,0.14)]">
-                        <div className="flex items-center justify-center">
-                            <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4" />
-                        </div>
+                    <div className="flex items-center justify-center py-2">
+                        <div data-widget-key="b22b183d-3336-4b9b-973d-12c1e47888c4" />
                     </div>
                 </section>
 
