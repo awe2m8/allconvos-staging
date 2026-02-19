@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "allconvos | Mission Control for Local Legends",
+  title: "allconvos | Voice AI for Local Businesses",
   description: "The AI receptionist that answers every call, qualifies every lead, and books jobs 24/7.",
 };
 
