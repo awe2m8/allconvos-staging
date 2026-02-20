@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { appUrl, isRequestOnAppOrigin, shouldRedirectToAppOrigin } from "@/lib/siteUrls";
+import { appUrl, areAppAndMarketingOriginsUnified, isRequestOnAppOrigin, shouldRedirectToAppOrigin } from "@/lib/siteUrls";
 
 const isProtectedRoute = createRouteMatcher([
   "/app(.*)",
@@ -15,6 +15,7 @@ export default clerkMiddleware(async (auth, request) => {
   if (
     process.env.NODE_ENV === "production" &&
     request.nextUrl.pathname === "/" &&
+    !areAppAndMarketingOriginsUnified() &&
     isRequestOnAppOrigin(requestHost)
   ) {
     const { userId } = await auth();

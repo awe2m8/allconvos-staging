@@ -99,3 +99,9 @@ export function isRequestOnAppOrigin(requestHost: string | null): boolean {
 
   return appHost === incomingHost;
 }
+
+export function areAppAndMarketingOriginsUnified(): boolean {
+  const appHost = normalizeHost(new URL(getAppOrigin()).host);
+  const marketingHost = normalizeHost(new URL(getMarketingOrigin()).host);
+  return appHost === marketingHost;
+}
