@@ -67,6 +67,11 @@ interface TwilioProvisionResponse {
   error?: string;
 }
 
+interface TwilioDetachResponse {
+  number?: (TwilioProvisionedNumber & { voiceUrl?: string | null });
+  error?: string;
+}
+
 interface TwilioNumbersListResponse {
   numbers?: TwilioProvisionedNumber[];
   error?: string;
@@ -126,6 +131,8 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
   const [twilioSearchResults, setTwilioSearchResults] = useState<TwilioSearchNumber[]>([]);
   const [provisionedTwilioNumbers, setProvisionedTwilioNumbers] = useState<TwilioProvisionedNumber[]>([]);
   const [provisioningNumber, setProvisioningNumber] = useState<string | null>(null);
+  const [detachingNumberSid, setDetachingNumberSid] = useState<string | null>(null);
+  const [detachTargetVoiceUrl, setDetachTargetVoiceUrl] = useState("");
   const [provisionSuccessMessage, setProvisionSuccessMessage] = useState<string | null>(null);
   const [isLoadingSavedAgent, setIsLoadingSavedAgent] = useState(true);
 
@@ -665,6 +672,48 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
     }
   }
 
+  async function detachTwilioNumberFromAgent(sid: string) {
+    if (!createdLiveAgent?.agentId) {
+      setError("Create a live voice agent first.");
+      return;
+    }
+
+    setError(null);
+    setProvisionSuccessMessage(null);
+    setDetachingNumberSid(sid);
+
+    try {
+      const response = await fetch("/api/twilio/numbers/detach", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          agentId: createdLiveAgent.agentId,
+          sid,
+          targetVoiceUrl: detachTargetVoiceUrl.trim() || undefined,
+        }),
+      });
+
+      const data = (await response.json()) as TwilioDetachResponse;
+      if (!response.ok || !data.number) {
+        throw new Error(data.error || "Could not detach number");
+      }
+
+      await loadProvisionedTwilioNumbers(createdLiveAgent.agentId);
+      setProvisionSuccessMessage(
+        detachTargetVoiceUrl.trim()
+          ? `Detached ${data.number.phoneNumber} and repointed webhook successfully.`
+          : `Detached ${data.number.phoneNumber}.`
+      );
+    } catch (detachError: unknown) {
+      setProvisionSuccessMessage(null);
+      setError(detachError instanceof Error ? detachError.message : "Could not detach number");
+    } finally {
+      setDetachingNumberSid(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-8 md:p-10">
@@ -732,6 +781,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                 setDraft(null);
                 setCreatedLiveAgent(null);
                 setCopiedField(null);
+                setDetachTargetVoiceUrl("");
                 setProvisionSuccessMessage(null);
                 setError(null);
               }}
@@ -923,7 +973,7 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                   )}
 
                   <div className="space-y-2">
-                    <p className="text-xs text-gray-300">Active numbers</p>
+                    <p className="text-xs text-gray-300">Active numbers on your account</p>
                     {isLoadingProvisionedNumbers ? (
                       <p className="text-xs text-gray-400">Loading assigned numbers...</p>
                     ) : provisionedTwilioNumbers.length === 0 ? (
@@ -942,10 +992,31 @@ export function VoiceAgentBuilder({ planName }: { planName: string }) {
                             <span className="rounded-md border border-neon/40 bg-neon/15 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-neon">
                               {number.status}
                             </span>
+                            <button
+                              type="button"
+                              onClick={() => detachTwilioNumberFromAgent(number.sid)}
+                              disabled={detachingNumberSid === number.sid}
+                              className="inline-flex items-center justify-center rounded-lg border border-rose-300/40 px-3 py-2 text-xs font-mono uppercase tracking-widest text-rose-200 hover:bg-rose-300/10 disabled:opacity-60"
+                            >
+                              {detachingNumberSid === number.sid ? "Detaching" : "Detach"}
+                            </button>
                           </div>
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-300">Optional webhook for detached numbers</p>
+                    <input
+                      value={detachTargetVoiceUrl}
+                      onChange={(event) => setDetachTargetVoiceUrl(event.target.value)}
+                      placeholder="https://your-other-platform.com/twilio/incoming"
+                      className="h-11 w-full rounded-xl border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-neon/40"
+                    />
+                    <p className="text-xs text-gray-400">
+                      If provided, detach will also repoint Twilio Voice URL to this endpoint.
+                    </p>
                   </div>
 
                   <div className="space-y-3">

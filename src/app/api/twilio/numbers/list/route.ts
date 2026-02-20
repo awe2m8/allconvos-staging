@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getLatestSubscriptionForUser, isActiveSubscriptionStatus } from "@/lib/subscriptions";
 import { getVoiceAgentForUser } from "@/lib/voiceAgents";
-import { listTwilioPhoneNumbersForAgent } from "@/lib/twilioPhoneNumbers";
+import { listActiveTwilioPhoneNumbersForUser } from "@/lib/twilioPhoneNumbers";
 
 export async function GET(request: NextRequest) {
   const { userId } = await auth();
@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Agent not found or inactive." }, { status: 404 });
     }
 
-    const numbers = await listTwilioPhoneNumbersForAgent(userId, agentId);
+    const activeNumbers = await listActiveTwilioPhoneNumbersForUser(userId);
 
     return NextResponse.json({
-      numbers: numbers.map((number) => ({
+      numbers: activeNumbers.map((number) => ({
         id: number.id,
         sid: number.incoming_phone_number_sid,
         phoneNumber: number.phone_number,

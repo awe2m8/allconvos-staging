@@ -88,3 +88,78 @@ export async function listTwilioPhoneNumbersForAgent(userId: string, agentId: st
 
   return (data ?? []).map((row) => mapTwilioPhoneNumberRow(row as Record<string, unknown>));
 }
+
+export async function listActiveTwilioPhoneNumbersForUser(userId: string): Promise<TwilioPhoneNumberRecord[]> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from("twilio_phone_numbers")
+    .select("id, user_id, agent_id, twilio_account_sid, incoming_phone_number_sid, phone_number, friendly_name, voice_url, status, created_at, updated_at")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((row) => mapTwilioPhoneNumberRow(row as Record<string, unknown>));
+}
+
+export async function getTwilioPhoneNumberForUserAgentBySid(input: {
+  userId: string;
+  agentId: string;
+  incomingPhoneNumberSid: string;
+}): Promise<TwilioPhoneNumberRecord | null> {
+  const supabase = getSupabaseAdminClient();
+
+  const { data, error } = await supabase
+    .from("twilio_phone_numbers")
+    .select("id, user_id, agent_id, twilio_account_sid, incoming_phone_number_sid, phone_number, friendly_name, voice_url, status, created_at, updated_at")
+    .eq("user_id", input.userId)
+    .eq("agent_id", input.agentId)
+    .eq("incoming_phone_number_sid", input.incomingPhoneNumberSid)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return mapTwilioPhoneNumberRow(data as Record<string, unknown>);
+}
+
+export async function updateTwilioPhoneNumberStatus(input: {
+  id: string;
+  status: string;
+  voiceUrl?: string | null;
+}): Promise<TwilioPhoneNumberRecord> {
+  const supabase = getSupabaseAdminClient();
+
+  const updatePayload: Record<string, unknown> = {
+    status: input.status,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (input.voiceUrl !== undefined) {
+    updatePayload.voice_url = input.voiceUrl;
+  }
+
+  const { data, error } = await supabase
+    .from("twilio_phone_numbers")
+    .update(updatePayload)
+    .eq("id", input.id)
+    .select(
+      "id, user_id, agent_id, twilio_account_sid, incoming_phone_number_sid, phone_number, friendly_name, voice_url, status, created_at, updated_at"
+    )
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapTwilioPhoneNumberRow(data as Record<string, unknown>);
+}
