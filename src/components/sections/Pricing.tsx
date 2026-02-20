@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { appUrl } from "@/lib/siteUrls";
 
 const plans = [
     {
@@ -91,13 +90,13 @@ export function Pricing() {
                             </div>
 
                             <Link
-                                href={plan.price === 'CUSTOM' ? '/contact' : appUrl(`/start?plan=${plan.id}`)}
+                                href="/contact"
                                 className={`block w-full text-center py-4 rounded-xl font-mono uppercase italic tracking-widest text-xs transition-all duration-300 ${plan.popular
                                     ? 'bg-neon text-ocean-950 hover:bg-white'
                                     : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
                                     }`}
                             >
-                                {plan.price === 'CUSTOM' ? 'Explore this Solution' : 'Start Receptionist Setup'}
+                                Explore this Solution
                             </Link>
 
                             {/* Decorative background badge */}
