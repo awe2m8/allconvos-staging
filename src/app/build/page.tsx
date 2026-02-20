@@ -9,7 +9,6 @@ import { Button } from "../../components/ui/Button";
 import { BuildNextSteps } from "../../components/sections/BuildNextSteps";
 import { Pricing } from "../../components/sections/Pricing";
 import { Footer } from "../../components/Footer";
-import { appUrl } from "@/lib/siteUrls";
 
 export default function BuildPage() {
     const [micPermissionGranted, setMicPermissionGranted] = useState(false);
@@ -216,7 +215,7 @@ export default function BuildPage() {
                         <p className="text-gray-400 mb-10 font-mono text-sm uppercase tracking-widest leading-relaxed">
                             Initialize your professional mission control today.
                         </p>
-                        <Link href={appUrl("/start?plan=lite")}>
+                        <Link href="/contact">
                             <Button
                                 variant="primary"
                                 className="w-full sm:w-auto px-12 py-6 text-sm font-mono uppercase italic tracking-[0.2em]"
