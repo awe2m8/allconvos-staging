@@ -24,9 +24,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const rawPlan = readSingleParam(params.plan);
   const hasExplicitPlan = rawPlan === "lite" || rawPlan === "pro";
   const selectedPlanId = normalizePlanId(rawPlan);
-  const fallbackRedirectUrl = hasExplicitPlan
+  const postAuthRedirectUrl = hasExplicitPlan
     ? appUrl(`/start?plan=${selectedPlanId}`)
-    : appUrl("/app/onboarding");
+    : appUrl("/billing/checkout");
   const signUpUrl = hasExplicitPlan ? appUrl(`/signup?plan=${selectedPlanId}`) : appUrl("/signup");
   const homeUrl = marketingUrl("/");
 
@@ -42,7 +42,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         path="/login"
         routing="path"
         signUpUrl={signUpUrl}
-        fallbackRedirectUrl={fallbackRedirectUrl}
+        fallbackRedirectUrl={postAuthRedirectUrl}
+        forceRedirectUrl={postAuthRedirectUrl}
       />
     </main>
   );
